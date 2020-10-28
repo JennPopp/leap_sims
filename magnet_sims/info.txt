@@ -1,0 +1,77 @@
+
+This is Geant4 application to produce bremsstruhlung photons for LUXE BPPP study 
+and for simple simulation of gamma spectrometer with a converter.
+
+Typical setting are in luxe_e_gamma.mac file
+
+Primary particle settings:
+-----------------------------------------
+- particle type
+
+- momentum and position distribution has two options:
+  * x=y=px=py=0 corresponds to /lxphoton/gun/beamType  mono
+  * and Gaussian beam (/lxphoton/gun/beamType  gaussian) with settings of sigma_x and sigma_y at IP. 
+    In this version the emmitance is fixed for Gaussian beam, 
+    but of course it can be chanegd in PrimaryGeneratorAction::SetDefaultKinematic().
+
+- energy has two options:
+  * mono-energetic beam
+  * arbitrary spectra can be loaded from a file with simple x y data format. 
+    There are examples: spectra_test1.txt and spectra_test_compt.txt
+    
+  Differnt options for position can be combined with options for energy settings.  
+    
+    
+Geometry:
+-----------------------------------------
+- target material, size, position;
+- World size and material;
+
+Physics list:
+-----------------------------------------
+- emstandard_opt0, 1, 2, 3, 4 and others.
+
+Simulation:
+-----------------------------------------
+- secondaries production cut (/run/setCut )
+- maximum step in absorber (/lxphoton/stepMax )
+
+
+Output
+-----------------------------------------
+- File name with histograms and TTree
+- Histograms setting are in separate mac file (hist_settings.mac)
+- Type of the particle which are saved in the TTree, their x and y position cuts. 
+  This is needed because saving everything (which is also possible) produces quite a big file. 
+
+  
+Here are environment settings and CMake used:   
+. /cvmfs/sft.cern.ch/lcg/releases/LCG_97/Geant4/10.06.p01/x86_64-centos7-gcc8-opt/Geant4-env.sh
+. /cvmfs/sft.cern.ch/lcg/releases/LCG_97/Geant4/10.06.p01/x86_64-centos7-gcc8-opt/bin/geant4.sh
+# use cmake /cvmfs/sft.cern.ch/lcg/releases/LCG_97/CMake/3.14.3/x86_64-centos7-gcc8-opt/bin/cmake
+
+
+Installation:
+-----------------------------------------
+cmake ./
+make
+
+
+Running:
+-----------------------------------------
+./lxbeamsim luxe_e_gamma.mac 1
+
+1 - means one thread. It was not tested well in case of more that 1 thread.
+
+
+
+Comments:
+-----------------------------------------
+Particles travels along z direction with initial position shortly before (~20 cm, at z~-20 cm) the target which is usually at position z=0.
+In case of Gaussian beam, it assumed to be focused on the positive edge of the World volume (z=0.5*WorldZ) around x=y=0.
+The tracks are analyzed in TrackingAction::PostUserTrackingAction(...) and there is fixed cut (z > 0.95*0.5*WorldZ) for the output to the TTree.
+Others can be configured using /lxphoton/ttree_cut_x(y) settings.
+
+
+
+

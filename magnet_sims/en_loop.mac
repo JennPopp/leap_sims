@@ -1,0 +1,13 @@
+
+
+
+/gun/energy {eKin} MeV
+
+/analysis/setFileName    jenn_magnet_test_mono{eKin}MeV_Mono_75mmFe.root
+
+
+# Run
+############################################
+/run/printProgress 1000
+/run/beamOn 100
+####################################

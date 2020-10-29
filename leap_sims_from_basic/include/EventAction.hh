@@ -23,40 +23,54 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// 
-/// \file B4PrimaryGeneratorAction.hh
-/// \brief Definition of the B4PrimaryGeneratorAction class
+//
+/// \file EventAction.hh
+/// \brief Definition of the EventAction class
 
-#ifndef B4PrimaryGeneratorAction_h
-#define B4PrimaryGeneratorAction_h 1
+#ifndef EventAction_h
+#define EventAction_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
+#include "G4UserEventAction.hh"
 #include "globals.hh"
 
-class G4ParticleGun;
-class G4Event;
-
-/// The primary generator action class with particle gum.
+/// Event action class
 ///
-/// It defines a single particle which hits the Absorber 
-/// perpendicular to the input face. The type of the particle
-/// can be changed via the G4 build-in commands of G4ParticleGun class 
-/// (see the macros provided with this example).
+/// It defines data members to hold the energy deposit and track lengths
+/// of charged particles in Absober and Gap layers:
+/// - fEnergyAbs, fEnergyGap, fTrackLAbs, fTrackLGap
+/// which are collected step by step via the functions
+/// - AddAbs(), AddGap()
 
-class B4PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class EventAction : public G4UserEventAction
 {
-public:
-  B4PrimaryGeneratorAction();    
-  virtual ~B4PrimaryGeneratorAction();
+  public:
+    EventAction();
+    virtual ~EventAction();
 
-  virtual void GeneratePrimaries(G4Event* event);
-  
-  // set methods
-  void SetRandomFlag(G4bool value);
+    virtual void  BeginOfEventAction(const G4Event* event);
+    virtual void    EndOfEventAction(const G4Event* event);
 
-private:
-  G4ParticleGun*  fParticleGun; // G4 particle gun
+    //void AddAbs(G4double de, G4double dl);
+    //void AddGap(G4double de, G4double dl);
+
+  private:
+    //G4double  fEnergyAbs;
+    //G4double  fEnergyGap;
+    //G4double  fTrackLAbs;
+    //G4double  fTrackLGap;
 };
+
+// inline functions
+
+//inline void EventAction::AddAbs(G4double de, G4double dl) {
+//  fEnergyAbs += de;
+//  fTrackLAbs += dl;
+//}
+
+//inline void EventAction::AddGap(G4double de, G4double dl) {
+//  fEnergyGap += de;
+//  fTrackLGap += dl;
+//}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

@@ -24,11 +24,11 @@
 // ********************************************************************
 //
 //
-/// \file B4aActionInitialization.hh
+/// \file ActionInitialization.hh
 /// \brief Definition of the B4aActionInitialization class
 
-#ifndef B4aActionInitialization_h
-#define B4aActionInitialization_h 1
+#ifndef ActionInitialization_h
+#define ActionInitialization_h 1
 
 #include "G4VUserActionInitialization.hh"
 
@@ -37,11 +37,11 @@ class DetectorConstruction;
 /// Action initialization class.
 ///
 
-class B4aActionInitialization : public G4VUserActionInitialization
+class ActionInitialization : public G4VUserActionInitialization
 {
   public:
-    B4aActionInitialization(DetectorConstruction*);
-    virtual ~B4aActionInitialization();
+    ActionInitialization(DetectorConstruction*);
+    virtual ~ActionInitialization();
 
     virtual void BuildForMaster() const;
     virtual void Build() const;
@@ -51,5 +51,3 @@ class B4aActionInitialization : public G4VUserActionInitialization
 };
 
 #endif
-
-    

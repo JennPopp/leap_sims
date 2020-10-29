@@ -23,47 +23,38 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// 
-/// \file B4RunAction.hh
-/// \brief Definition of the B4RunAction class
+//
+/// \file SteppingAction.hh
+/// \brief Definition of the SteppingAction class
 
-#ifndef B4RunAction_h
-#define B4RunAction_h 1
+#ifndef SteppingAction_h
+#define SteppingAction_h 1
 
-#include "G4UserRunAction.hh"
-#include "globals.hh"
+#include "G4UserSteppingAction.hh"
 
-class G4Run;
+class DetectorConstruction;
+class EventAction;
 
-/// Run action class
+/// Stepping action class.
 ///
-/// It accumulates statistic and computes dispersion of the energy deposit 
-/// and track lengths of charged particles with use of analysis tools:
-/// H1D histograms are created in BeginOfRunAction() for the following 
-/// physics quantities:
-/// - Edep in absorber
-/// - Edep in gap
-/// - Track length in absorber
-/// - Track length in gap
-/// The same values are also saved in the ntuple.
-/// The histograms and ntuple are saved in the output file in a format
-/// accoring to a selected technology in B4Analysis.hh.
-///
-/// In EndOfRunAction(), the accumulated statistic and computed 
-/// dispersion is printed.
-///
+/// In UserSteppingAction() there are collected the energy deposit and track
+/// lengths of charged particles in Absober and Gap layers and
+/// updated in EventAction.
 
-class B4RunAction : public G4UserRunAction
+class SteppingAction : public G4UserSteppingAction
 {
-  public:
-    B4RunAction();
-    virtual ~B4RunAction();
+public:
+  SteppingAction(const DetectorConstruction* detectorConstruction,
+                    EventAction* eventAction);
+  virtual ~SteppingAction();
 
-    virtual void BeginOfRunAction(const G4Run*);
-    virtual void   EndOfRunAction(const G4Run*);
+  virtual void UserSteppingAction(const G4Step* step);
+
+private:
+  const DetectorConstruction* fDetConstruction;
+  EventAction*  fEventAction;  
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-

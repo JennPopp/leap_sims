@@ -24,45 +24,40 @@
 // ********************************************************************
 //
 //
-/// \file B4aActionInitialization.cc
-/// \brief Implementation of the B4aActionInitialization class
+/// \file PrimaryGeneratorAction.hh
+/// \brief Definition of the PrimaryGeneratorAction class
 
-#include "B4aActionInitialization.hh"
-#include "B4PrimaryGeneratorAction.hh"
-#include "B4RunAction.hh"
-#include "B4aEventAction.hh"
-#include "B4aSteppingAction.hh"
-#include "DetectorConstruction.hh"
+#ifndef PrimaryGeneratorAction_h
+#define PrimaryGeneratorAction_h 1
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#include "G4VUserPrimaryGeneratorAction.hh"
+#include "globals.hh"
 
-B4aActionInitialization::B4aActionInitialization
-                            (DetectorConstruction* detConstruction)
- : G4VUserActionInitialization(),
-   fDetConstruction(detConstruction)
-{}
+class G4ParticleGun;
+class G4Event;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+/// The primary generator action class with particle gum.
+///
+/// It defines a single particle which hits the Absorber
+/// perpendicular to the input face. The type of the particle
+/// can be changed via the G4 build-in commands of G4ParticleGun class
+/// (see the macros provided with this example).
 
-B4aActionInitialization::~B4aActionInitialization()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void B4aActionInitialization::BuildForMaster() const
+class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
-  SetUserAction(new B4RunAction);
-}
+public:
+  PrimaryGeneratorAction();    
+  virtual ~PrimaryGeneratorAction();
+
+  virtual void GeneratePrimaries(G4Event* event);
+
+  // set methods
+  void SetRandomFlag(G4bool value);
+
+private:
+  G4ParticleGun*  fParticleGun; // G4 particle gun
+};
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B4aActionInitialization::Build() const
-{
-  SetUserAction(new B4PrimaryGeneratorAction);
-  SetUserAction(new B4RunAction);
-  auto eventAction = new B4aEventAction;
-  SetUserAction(eventAction);
-  SetUserAction(new B4aSteppingAction(fDetConstruction,eventAction));
-}  
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#endif

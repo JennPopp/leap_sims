@@ -60,18 +60,55 @@ RunAction::RunAction()
   //
 
   // Creating histograms
-  analysisManager->CreateH1("Eabs","Edep in absorber", 100, 0., 800*MeV);
-  analysisManager->CreateH1("Egap","Edep in gap", 100, 0., 100*MeV);
-  analysisManager->CreateH1("Labs","trackL in absorber", 100, 0., 1*m);
-  analysisManager->CreateH1("Lgap","trackL in gap", 100, 0., 50*cm);
+  //analysisManager->CreateH1("Eabs","Edep in absorber", 100, 0., 800*MeV);
+  //analysisManager->CreateH1("Egap","Edep in gap", 100, 0., 100*MeV);
+  //analysisManager->CreateH1("Labs","trackL in absorber", 100, 0., 1*m);
+  //analysisManager->CreateH1("Lgap","trackL in gap", 100, 0., 50*cm);
 
   // Creating ntuple
   //
-  analysisManager->CreateNtuple("", "Edep and TrackL");
-  analysisManager->CreateNtupleDColumn("Eabs");
-  analysisManager->CreateNtupleDColumn("Egap");
-  analysisManager->CreateNtupleDColumn("Labs");
-  analysisManager->CreateNtupleDColumn("Lgap");
+  // Creating ntuple vacstep1 , id=0
+  //
+  analysisManager->CreateNtuple("bremssim1", "vacstep1");
+  analysisManager->CreateNtupleIColumn("pdg");
+  analysisManager->CreateNtupleDColumn("E");
+  analysisManager->CreateNtupleDColumn("x");
+  analysisManager->CreateNtupleDColumn("y");
+  analysisManager->CreateNtupleDColumn("z");
+  analysisManager->CreateNtupleDColumn("startx");
+  analysisManager->CreateNtupleDColumn("starty");
+  analysisManager->CreateNtupleDColumn("startz");
+  analysisManager->CreateNtupleDColumn("px");
+  analysisManager->CreateNtupleDColumn("py");
+  analysisManager->CreateNtupleDColumn("pz");
+  analysisManager->CreateNtupleDColumn("Polx");
+  analysisManager->CreateNtupleDColumn("Poly");
+  analysisManager->CreateNtupleDColumn("Polz");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleDColumn("ParentID");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->FinishNtuple();
+
+  // Creating ntuple vacstep2 , id=1
+  //
+  analysisManager->CreateNtuple("bremssim2", "vacstep2");
+  analysisManager->CreateNtupleIColumn("pdg");
+  analysisManager->CreateNtupleDColumn("E");
+  analysisManager->CreateNtupleDColumn("x");
+  analysisManager->CreateNtupleDColumn("y");
+  analysisManager->CreateNtupleDColumn("z");
+  analysisManager->CreateNtupleDColumn("startx");
+  analysisManager->CreateNtupleDColumn("starty");
+  analysisManager->CreateNtupleDColumn("startz");
+  analysisManager->CreateNtupleDColumn("px");
+  analysisManager->CreateNtupleDColumn("py");
+  analysisManager->CreateNtupleDColumn("pz");
+  analysisManager->CreateNtupleDColumn("Polx");
+  analysisManager->CreateNtupleDColumn("Poly");
+  analysisManager->CreateNtupleDColumn("Polz");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleDColumn("ParentID");
+  analysisManager->CreateNtupleDColumn("EventID");
   analysisManager->FinishNtuple();
 }
 
@@ -102,6 +139,7 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/)
 
 void RunAction::EndOfRunAction(const G4Run* /*run*/)
 {
+  /*
   // print histogram statistics
   //
   auto analysisManager = G4AnalysisManager::Instance();
@@ -134,7 +172,7 @@ void RunAction::EndOfRunAction(const G4Run* /*run*/)
       << " rms = "
       << G4BestUnit(analysisManager->GetH1(3)->rms(),  "Length") << G4endl;
   }
-
+*/
   // save histograms & ntuple
   //
   analysisManager->Write();

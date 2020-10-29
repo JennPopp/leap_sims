@@ -24,88 +24,83 @@
 // ********************************************************************
 //
 //
-/// \file EventAction.cc
-/// \brief Implementation of the EventAction class
+/// \file PrimaryGeneratorAction.cc
+/// \brief Implementation of the PrimaryGeneratorAction class
 
-#include "EventAction.hh"
-#include "B4RunAction.hh"
-#include "B4Analysis.hh"
+#include "PrimaryGeneratorAction.hh"
 
 #include "G4RunManager.hh"
+#include "G4LogicalVolumeStore.hh"
+#include "G4LogicalVolume.hh"
+#include "G4Box.hh"
 #include "G4Event.hh"
-#include "G4UnitsTable.hh"
-
+#include "G4ParticleGun.hh"
+#include "G4ParticleTable.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
-#include <iomanip>
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-EventAction::EventAction()
- : G4UserEventAction(),
-   fEnergyAbs(0.),
-   fEnergyGap(0.),
-   fTrackLAbs(0.),
-   fTrackLGap(0.)
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-EventAction::~EventAction()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void EventAction::BeginOfEventAction(const G4Event* /*event*/)
+PrimaryGeneratorAction::PrimaryGeneratorAction()
+ : G4VUserPrimaryGeneratorAction(),
+   fParticleGun(nullptr)
 {
-  // initialisation per event
-  fEnergyAbs = 0.;
-  fEnergyGap = 0.;
-  fTrackLAbs = 0.;
-  fTrackLGap = 0.;
+  G4int nofParticles = 1;
+  fParticleGun = new G4ParticleGun(nofParticles);
+
+  // default particle kinematic
+  //
+  auto particleDefinition
+    = G4ParticleTable::GetParticleTable()->FindParticle("e-");
+  fParticleGun->SetParticleDefinition(particleDefinition);
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+  fParticleGun->SetParticleEnergy(60.*MeV);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void EventAction::EndOfEventAction(const G4Event* event)
+PrimaryGeneratorAction::~PrimaryGeneratorAction()
 {
-  // Accumulate statistics
+  delete fParticleGun;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
+{
+  // This function is called at the begining of event
+
+  // In order to avoid dependence of PrimaryGeneratorAction
+  // on DetectorConstruction class we get world volume
+  // from G4LogicalVolumeStore
   //
+  G4double worldZHalfLength = 0.;
+  auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
 
-  // get analysis manager
-  auto analysisManager = G4AnalysisManager::Instance();
-
-  // fill histograms
-  analysisManager->FillH1(0, fEnergyAbs);
-  analysisManager->FillH1(1, fEnergyGap);
-  analysisManager->FillH1(2, fTrackLAbs);
-  analysisManager->FillH1(3, fTrackLGap);
-
-  // fill ntuple
-  analysisManager->FillNtupleDColumn(0, fEnergyAbs);
-  analysisManager->FillNtupleDColumn(1, fEnergyGap);
-  analysisManager->FillNtupleDColumn(2, fTrackLAbs);
-  analysisManager->FillNtupleDColumn(3, fTrackLGap);
-  analysisManager->AddNtupleRow();
-
-  // Print per event (modulo n)
-  //
-  auto eventID = event->GetEventID();
-  auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
-  if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {
-    G4cout << "---> End of event: " << eventID << G4endl;
-
-    G4cout
-       << "   Absorber: total energy: " << std::setw(7)
-                                        << G4BestUnit(fEnergyAbs,"Energy")
-       << "       total track length: " << std::setw(7)
-                                        << G4BestUnit(fTrackLAbs,"Length")
-       << G4endl
-       << "        Gap: total energy: " << std::setw(7)
-                                        << G4BestUnit(fEnergyGap,"Energy")
-       << "       total track length: " << std::setw(7)
-                                        << G4BestUnit(fTrackLGap,"Length")
-       << G4endl;
+  // Check that the world volume has box shape
+  G4Box* worldBox = nullptr;
+  if (  worldLV ) {
+    worldBox = dynamic_cast<G4Box*>(worldLV->GetSolid());
   }
+
+  if ( worldBox ) {
+    worldZHalfLength = worldBox->GetZHalfLength();
+  }
+  else  {
+    G4ExceptionDescription msg;
+    msg << "World volume of box shape not found." << G4endl;
+    msg << "Perhaps you have changed geometry." << G4endl;
+    msg << "The gun will be place in the center.";
+    G4Exception("PrimaryGeneratorAction::GeneratePrimaries()",
+      "MyCode0002", JustWarning, msg);
+  }
+
+  // Set gun position
+  fParticleGun
+    ->SetParticlePosition(G4ThreeVector(0., 0., -worldZHalfLength));
+
+  fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

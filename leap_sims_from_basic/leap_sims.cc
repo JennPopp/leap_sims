@@ -24,11 +24,11 @@
 // ********************************************************************
 //
 //
-/// \file exampleB4a.cc
-/// \brief Main program of the B4a example
+/// \file example.cc
+/// \brief Main program of the  example
 
 #include "DetectorConstruction.hh"
-#include "B4aActionInitialization.hh"
+#include "ActionInitialization.hh"
 
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
@@ -50,7 +50,7 @@
 namespace {
   void PrintUsage() {
     G4cerr << " Usage: " << G4endl;
-    G4cerr << " exampleB4a [-m macro ] [-u UIsession] [-t nThreads]" << G4endl;
+    G4cerr << " leap_sims [-m macro ] [-u UIsession] [-t nThreads]" << G4endl;
     G4cerr << "   note: -t option is available only for multi-threaded mode."
            << G4endl;
   }
@@ -116,7 +116,7 @@ int main(int argc,char** argv)
   auto physicsList = new FTFP_BERT;
   runManager->SetUserInitialization(physicsList);
 
-  auto actionInitialization = new B4aActionInitialization(detConstruction);
+  auto actionInitialization = new ActionInitialization(detConstruction);
   runManager->SetUserInitialization(actionInitialization);
 
   // Initialize visualization

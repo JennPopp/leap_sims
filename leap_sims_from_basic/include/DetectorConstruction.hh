@@ -35,7 +35,7 @@
 
 class G4VPhysicalVolume;
 class G4GlobalMagFieldMessenger;
-class G4PolarizationMessenger;
+class G4PolarizationManager;
 /// Detector construction class to define materials and geometry.
 /// The Absorber is a box made of a given number of layers. A layer consists
 /// of an absorber plate and of a detection gap. The layer is replicated.
@@ -63,7 +63,9 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     // get methods
     //
     const G4VPhysicalVolume* GetAbsorberPV() const;
-    const G4VPhysicalVolume* GetGapPV() const;
+    const G4VPhysicalVolume* GetMagnetPV() const;
+    const G4VPhysicalVolume* GetVacStep1PV() const;
+    const G4VPhysicalVolume* GetVacStep2PV() const;
 
   private:
     // methods
@@ -77,7 +79,9 @@ class DetectorConstruction : public G4VUserDetectorConstruction
                                       // magnetic field messenger
 
     G4VPhysicalVolume*   fAbsorberPV; // the absorber physical volume
-    G4VPhysicalVolume*   fMagnetPV;      // the gap physical volume
+    G4VPhysicalVolume*   fMagnetPV;      // the magnet physical volume
+    G4VPhysicalVolume*   fVacStepPV1;  // the physical volume of vacstep1
+    G4VPhysicalVolume*   fVacStepPV2;
 
     G4bool  fCheckOverlaps; // option to activate checking of volumes overlaps
 };
@@ -92,7 +96,12 @@ inline const G4VPhysicalVolume* DetectorConstruction::GetMagnetPV() const  {
   return fMagnetPV;
 }
 
-
+inline const G4VPhysicalVolume* DetectorConstruction::GetVacStep1PV() const {
+  return fVacStepPV1;
+}
+inline const G4VPhysicalVolume* DetectorConstruction::GetVacStep2PV() const {
+  return fVacStepPV2;
+}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

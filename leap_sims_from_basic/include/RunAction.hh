@@ -24,56 +24,45 @@
 // ********************************************************************
 //
 //
-/// \file SteppingAction.cc
-/// \brief Implementation of the SteppingAction class
+/// \file RunAction.hh
+/// \brief Definition of the RunAction class
 
-#include "SteppingAction.hh"
-#include "EventAction.hh"
-#include "DetectorConstruction.hh"
+#ifndef RunAction_h
+#define RunAction_h 1
 
-#include "G4Step.hh"
-#include "G4RunManager.hh"
+#include "G4UserRunAction.hh"
+#include "globals.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+class G4Run;
 
-SteppingAction::SteppingAction(
-                      const DetectorConstruction* detectorConstruction,
-                      EventAction* eventAction)
-  : G4UserSteppingAction(),
-    fDetConstruction(detectorConstruction),
-    fEventAction(eventAction)
-{}
+/// Run action class
+///
+/// It accumulates statistic and computes dispersion of the energy deposit
+/// and track lengths of charged particles with use of analysis tools:
+/// H1D histograms are created in BeginOfRunAction() for the following
+/// physics quantities:
+/// - Edep in absorber
+/// - Edep in gap
+/// - Track length in absorber
+/// - Track length in gap
+/// The same values are also saved in the ntuple.
+/// The histograms and ntuple are saved in the output file in a format
+/// accoring to a selected technology in Analysis.hh.
+///
+/// In EndOfRunAction(), the accumulated statistic and computed
+/// dispersion is printed.
+///
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-SteppingAction::~SteppingAction()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void SteppingAction::UserSteppingAction(const G4Step* step)
+class RunAction : public G4UserRunAction
 {
-// Collect energy and track length step by step
+  public:
+    RunAction();
+    virtual ~RunAction();
 
-  // get volume of the current step
-  auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
-
-  // energy deposit
-  auto edep = step->GetTotalEnergyDeposit();
-
-  // step length
-  G4double stepLength = 0.;
-  if ( step->GetTrack()->GetDefinition()->GetPDGCharge() != 0. ) {
-    stepLength = step->GetStepLength();
-  }
-
-  if ( volume == fDetConstruction->GetAbsorberPV() ) {
-    fEventAction->AddAbs(edep,stepLength);
-  }
-
-  if ( volume == fDetConstruction->GetGapPV() ) {
-    fEventAction->AddGap(edep,stepLength);
-  }
-}
+    virtual void BeginOfRunAction(const G4Run*);
+    virtual void   EndOfRunAction(const G4Run*);
+};
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+#endif

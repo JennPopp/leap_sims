@@ -23,38 +23,46 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// 
-/// \file B4aSteppingAction.hh
-/// \brief Definition of the B4aSteppingAction class
+//
+/// \file ActionInitialization.cc
+/// \brief Implementation of the ActionInitialization class
 
-#ifndef B4aSteppingAction_h
-#define B4aSteppingAction_h 1
-
-#include "G4UserSteppingAction.hh"
-
-class DetectorConstruction;
-class B4aEventAction;
-
-/// Stepping action class.
-///
-/// In UserSteppingAction() there are collected the energy deposit and track 
-/// lengths of charged particles in Absober and Gap layers and
-/// updated in B4aEventAction.
-
-class B4aSteppingAction : public G4UserSteppingAction
-{
-public:
-  B4aSteppingAction(const DetectorConstruction* detectorConstruction,
-                    B4aEventAction* eventAction);
-  virtual ~B4aSteppingAction();
-
-  virtual void UserSteppingAction(const G4Step* step);
-    
-private:
-  const DetectorConstruction* fDetConstruction;
-  B4aEventAction*  fEventAction;  
-};
+#include "ActionInitialization.hh"
+#include "PrimaryGeneratorAction.hh"
+#include "RunAction.hh"
+#include "EventAction.hh"
+#include "SteppingAction.hh"
+#include "DetectorConstruction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#endif
+ActionInitialization::ActionInitialization
+                            (DetectorConstruction* detConstruction)
+ : G4VUserActionInitialization(),
+   fDetConstruction(detConstruction)
+{}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+ActionInitialization::~ActionInitialization()
+{}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void ActionInitialization::BuildForMaster() const
+{
+  SetUserAction(new RunAction);
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void ActionInitialization::Build() const
+{
+  SetUserAction(new PrimaryGeneratorAction);
+  SetUserAction(new RunAction);
+  auto eventAction = new EventAction;
+  SetUserAction(eventAction);
+  SetUserAction(new SteppingAction(fDetConstruction,eventAction));
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -38,6 +38,7 @@
 #include "G4PVPlacement.hh"
 #include "G4PVReplica.hh"
 #include "G4GlobalMagFieldMessenger.hh"
+#include "G4PolarizationManager.hh"
 #include "G4AutoDelete.hh"
 
 #include "G4GeometryManager.hh"
@@ -50,6 +51,7 @@
 
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -87,15 +89,15 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 void DetectorConstruction::DefineMaterials()
 {
-  // Iron material defined using NIST Manager
+  // Iron and Tungsten material defined using NIST Manager
   auto nistManager = G4NistManager::Instance();
   nistManager->FindOrBuildMaterial("G4_Fe");
-
-  // Tungsten material defined using NIST Manager
-  //auto nistManager = G4NistManager::Instance();
-  //nistManager->FindOrBuildMaterial("G4_W");
+  nistManager->FindOrBuildMaterial("G4_W");
 
   // Vacuum
+  G4double a;  // mass of a mole;
+  G4double z;  // z=mean number of protons;
+  G4double density;
   new G4Material("Galactic", z=1., a=1.01*g/mole,density= universe_mean_density,
                   kStateGas, 2.73*kelvin, 3.e-18*pascal);
 
@@ -190,6 +192,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
    //
    //vacuum step 1
    //
+   auto
    fVacStepS1 = new G4Tubs("VacStep",  //Name
                                0.,         // inner radius
                                absrad,     // outer radius
@@ -197,24 +200,29 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                                0.0*deg,    // starting phi angle
                                360.0*deg); // angle of the segment
 
+  auto
    fVacStepLV1 = new G4LogicalVolume(fVacStepS1,    //its solid
                                         worldMat,    //its material
-                                        "VacStep");       //its name
+                                        "VacStep");  //its name
 
    fVacStepPV1 = new G4PVPlacement(0,                   //no rotation
                         G4ThreeVector(0.,0., ZposVac1),    //its position
                                 fVacStepLV1,            //its logical volume
                                 "VacStep",                 //its name
-                                fLogicWorld,               //its mother
+                                worldLV,               //its mother
                                 false,                     //no boolean operat
                                 0);                        //copy number
 
   //
   // Magnet
   //
-  auto magnetS
-    = new G4Box("Magnet",            // its name
-                 calorSizeXY/2, calorSizeXY/2, absoThickness/2); // its size
+ auto magnetS
+   = new G4Tubs("Magnet", //Name
+               0.,         // inner radius
+               absrad,     // outer radius
+               magthick/2., // half length in z
+               0.0*rad,    // starting phi angle
+               twopi*rad); // angle of the segment
 
   auto magnetLV
     = new G4LogicalVolume(
@@ -225,29 +233,29 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   fMagnetPV
     = new G4PVPlacement(
                  0,                // no rotation
-                 G4ThreeVector(0., 0., -gapThickness/2), // its position
-                 absorberLV,       // its logical volume
-                 "Abso",           // its name
-                 layerLV,          // its mother  volume
+                 G4ThreeVector(0., 0., ZposMag), // its position
+                 magnetLV,       // its logical volume
+                 "Magnet",           // its name
+                 worldLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps
 
  auto polvec=G4ThreeVector(0.,0.,-1.0);
  G4PolarizationManager * polMgr = G4PolarizationManager::GetInstance();
- polMgr->SetVolumePolarization(fLogicPolMag, polvec);
+ polMgr->SetVolumePolarization(magnetLV, polvec);
 
  //
  //vacuum step 2
  //
- fVacStepS2 = new G4Tubs("VacStep2",  //Name
+auto fVacStepS2 = new G4Tubs("VacStep2",  //Name
                              0.,         // inner radius
                              absrad,     // outer radius
                              vacthick/2., // half length in z
                              0.0*deg,    // starting phi angle
                              360.0*deg); // angle of the segment
 
- fVacStepLV2 = new G4LogicalVolume(fVacStepS2,    //its solid
+ auto fVacStepLV2 = new G4LogicalVolume(fVacStepS2,    //its solid
                                       worldMat,    //its material
                                       "VacStep2");       //its name
 
@@ -255,7 +263,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                       G4ThreeVector(0.,0., ZposVac2),    //its position
                               fVacStepLV2,            //its logical volume
                               "VacStep2",                 //its name
-                              fLogicWorld,               //its mother
+                              worldLV,               //its mother
                               false,                     //no boolean operat
                               0);                        //copy number
 
@@ -272,7 +280,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
     << "\t Size in XY: "<< G4BestUnit(worldSizeXY,"Length")<< G4endl
 
     << "\n The Reconversion Target "<< G4endl
-    << "\t material: "<< absmat->GetName()<< G4endl
+    << "\t material: "<< absMat->GetName()<< G4endl
     << "\t thickness: "<< G4BestUnit(absthick,"Length")<< G4endl
     << "\t radius: "<< G4BestUnit(absrad,"Length")<< G4endl
     << "\t Z-position of centre: "<< G4BestUnit(ZposAbs,"Length")<< G4endl
@@ -282,7 +290,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
     << "\t Z-position of centre: "<< G4BestUnit(ZposVac1,"Length")<< G4endl
 
     << "\n The Magnetized Iron Block "<< G4endl
-    << "\t material: "<< magmat->GetName()<< G4endl
+    << "\t material: "<< magMat->GetName()<< G4endl
     << "\t thickness: "<< G4BestUnit(magthick,"Length")<< G4endl
     << "\t Z-position of centre: "<< G4BestUnit(ZposMag,"Length")<< G4endl
     //<< "\t Z-component of B-field: "<< G4BestUnit(magvec[2],"Magnetic flux density")<< G4endl

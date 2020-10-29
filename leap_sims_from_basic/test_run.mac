@@ -1,0 +1,13 @@
+# Macro file for leap_sims
+#
+
+
+# Initialize kernel
+/run/initialize
+#
+# Default kinematics:
+# electron 60 MeV in direction (0.,0.,1.)
+
+#/tracking/verbose 0
+/run/printProgress 100
+/run/beamOn 1000

@@ -51,6 +51,7 @@ set(LEAP_SIMS_SCRIPTS
   plotNtuple.C
   run1.mac
   run2.mac
+  test_run.mac
   vis.mac
   )
 

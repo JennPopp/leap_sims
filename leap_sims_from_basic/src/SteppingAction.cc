@@ -61,7 +61,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   // get volume of the current step
   auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
 
-  if ( volume == fDetector->GetVacStep1PV() ) {
+  if ( volume == fDetConstruction->GetVacStep1PV() ) {
        // get analysis manager
        auto analysisManager = G4AnalysisManager::Instance();
 
@@ -95,7 +95,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   //G4cout<< " This part of the code you are currently testing is executed"  << G4endl;
      }
 
-     if ( volume == fDetector->GetVacStep2PV() ) {
+     if ( volume == fDetConstruction->GetVacStep2PV() ) {
 
           auto analysisManager = G4AnalysisManager::Instance();
          //~//~//~//

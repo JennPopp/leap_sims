@@ -39,10 +39,10 @@ target_link_libraries(leap_sims ${Geant4_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
-# build B4a. This is so that we can run the executable directly because it
+# build leap_sims. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #
-set(EXAMPLEB4A_SCRIPTS
+set(LEAP_SIMS_SCRIPTS
   leap_sims.out
   leap_sims.in
   gui.mac
@@ -54,7 +54,7 @@ set(EXAMPLEB4A_SCRIPTS
   vis.mac
   )
 
-foreach(_script ${EXAMPLEB4A_SCRIPTS})
+foreach(_script ${LEAP_SIMS_SCRIPTS})
   configure_file(
     ${PROJECT_SOURCE_DIR}/${_script}
     ${PROJECT_BINARY_DIR}/${_script}

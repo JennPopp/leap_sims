@@ -38,7 +38,8 @@
 
 #include "G4UImanager.hh"
 #include "G4UIcommand.hh"
-#include "FTFP_BERT.hh"
+//#include "FTFP_BERT.hh"
+#include "G4EmLivermorePolarizedPhysics.hh"
 
 #include "Randomize.hh"
 
@@ -114,6 +115,7 @@ int main(int argc,char** argv)
   runManager->SetUserInitialization(detConstruction);
 
   auto physicsList = new FTFP_BERT;
+  //auto physicsList = new G4EmLivermorePolarizedPhysics;
   runManager->SetUserInitialization(physicsList);
 
   auto actionInitialization = new ActionInitialization(detConstruction);

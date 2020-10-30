@@ -23,49 +23,52 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file polarisation/Pol01/src/PhysicsListMessenger.cc
-/// \brief Implementation of the PhysicsListMessenger class
+/// \file polarisation/Pol01/include/StepMax.hh
+/// \brief Definition of the StepMax class
 //
 //
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "PhysicsListMessenger.hh"
+#ifndef StepMax_h
+#define StepMax_h 1
 
-#include "PhysicsList.hh"
-#include "G4UIdirectory.hh"
-#include "G4UIcmdWithAString.hh"
+#include "globals.hh"
+#include "G4VDiscreteProcess.hh"
+
+class StepMaxMessenger;
+class G4ParticleDefinition;
+class G4Step;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PhysicsListMessenger::PhysicsListMessenger(PhysicsList* pPhys)
-: G4UImessenger(),
-  fPhysicsList(pPhys), fPhysDir(0), fListCmd(0)
+class StepMax : public G4VDiscreteProcess
 {
-  fPhysDir = new G4UIdirectory("/leap_sims/phys/");
-  fPhysDir->SetGuidance("physics list commands");
+  public:     
 
-  fListCmd = new G4UIcmdWithAString("/leap_sims/phys/addPhysics",this);
-  fListCmd->SetGuidance("Select standard/polarized physics list.");
-  fListCmd->SetParameterName("PList",false);
-  fListCmd->AvailableForStates(G4State_PreInit);
-}
+     StepMax(const G4String& processName ="stepMax");
+    ~StepMax();
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+     virtual G4bool   IsApplicable(const G4ParticleDefinition&);    
+     void     SetMaxStep(G4double);
+     G4double GetMaxStep() {return fMaxChargedStep;};
+     
+     virtual G4double PostStepGetPhysicalInteractionLength( const G4Track& track,
+                                             G4double   previousStepSize,
+                                             G4ForceCondition* condition);
 
-PhysicsListMessenger::~PhysicsListMessenger()
-{
-  delete fListCmd;
-  delete fPhysDir;
-}
+     virtual G4VParticleChange* PostStepDoIt(const G4Track&, const G4Step&);
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+     virtual G4double GetMeanFreePath(const G4Track&, G4double, G4ForceCondition*)
+       {return 0.;};     // it is not needed here !
 
-void PhysicsListMessenger::SetNewValue(G4UIcommand* command,
-                                          G4String newValue)
-{
-  if( command == fListCmd )
-   { fPhysicsList->AddPhysicsList(newValue);}
-}
+  private:
+
+     G4double    fMaxChargedStep;
+     StepMaxMessenger* fMessenger;
+};
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+#endif
+

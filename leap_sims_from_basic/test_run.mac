@@ -1,6 +1,6 @@
 # Macro file for leap_sims
 #
-
+/leap_sims/phys/addPhysics polarized
 
 # Initialize kernel
 /run/initialize

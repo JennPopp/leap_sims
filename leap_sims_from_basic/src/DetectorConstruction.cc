@@ -127,7 +127,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
   // Get materials
   auto worldMat = G4Material::GetMaterial("Galactic");
-  auto absMat = G4Material::GetMaterial("G4_W");
+  //auto absMat = G4Material::GetMaterial("G4_W");
+  auto absMat = G4Material::GetMaterial("Galactic");
   auto magMat = G4Material::GetMaterial("G4_Fe");
 
   if ( ! worldMat || ! absMat || ! magMat ) {
@@ -175,7 +176,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto absorberLV
     = new G4LogicalVolume(
                  absorberS,     // its solid
-                 worldMat,  // its material
+                 absMat,  // its material
                  "Absorber");   // its name
   fAbsorberPV
     = new G4PVPlacement(

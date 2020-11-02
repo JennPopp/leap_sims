@@ -4,6 +4,11 @@
 
 # Initialize kernel
 /run/initialize
+
+
+/polarization/manager/verbose 1
+/polarization/volume/set Magnet 0. 0. 1.
+/polarization/volume/list
 #
 # Default kinematics:
 # electron 60 MeV in direction (0.,0.,1.)

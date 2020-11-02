@@ -242,7 +242,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps
 
- auto polvec=G4ThreeVector(0.,0.,-1.0);
+ auto polvec=G4ThreeVector(0.,0.,1.0);
  G4PolarizationManager * polMgr = G4PolarizationManager::GetInstance();
  polMgr->SetVolumePolarization(magnetLV, polvec);
 

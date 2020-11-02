@@ -43,14 +43,8 @@ target_link_libraries(leap_sims ${Geant4_LIBRARIES})
 # relies on these scripts being in the current working directory.
 #
 set(LEAP_SIMS_SCRIPTS
-  leap_sims.out
-  leap_sims.in
   gui.mac
   init_vis.mac
-  plotHisto.C
-  plotNtuple.C
-  run1.mac
-  run2.mac
   test_run.mac
   vis.mac
   )

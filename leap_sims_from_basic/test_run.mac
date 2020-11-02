@@ -7,8 +7,8 @@
 #
 # Default kinematics:
 # electron 60 MeV in direction (0.,0.,1.)
-/gun/particle/ gamma
-/gun/energy/ 6 MeV 
+/gun/particle gamma
+/gun/energy 3 MeV
 /gun/polarization 0. 0. 1.
 
 #/tracking/verbose 0

@@ -54,7 +54,7 @@ EventAction::~EventAction()
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
+/*
 void EventAction::BeginOfEventAction(const G4Event*)
 {
   // initialisation per event
@@ -107,5 +107,5 @@ void EventAction::EndOfEventAction(const G4Event* event)
   //     << G4endl;
   //}
 }
-
+*/
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

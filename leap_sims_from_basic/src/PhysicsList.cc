@@ -26,14 +26,15 @@
 /// \file polarisation/Pol01/src/PhysicsList.cc
 /// \brief Implementation of the PhysicsList class
 //
-// 
+//
 //
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "PhysicsList.hh"
 #include "PhysicsListMessenger.hh"
- 
+
+#include "G4EmLivermorePolarizedPhysics.hh"
 #include "G4EmStandardPhysics.hh"
 #include "PhysListEmPolarized.hh"
 
@@ -41,7 +42,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PhysicsList::PhysicsList() 
+PhysicsList::PhysicsList()
 : G4VModularPhysicsList(),
   fEmPhysicsList(0), fEmName("polarized"), fMessenger(0)
 {
@@ -109,10 +110,10 @@ void PhysicsList::ConstructProcess()
   // Electromagnetic physics list
   //
   fEmPhysicsList->ConstructProcess();
-    
+
   // step limitation (as a full process)
-  //  
-  AddStepMax();      
+  //
+  AddStepMax();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -122,7 +123,7 @@ void PhysicsList::AddPhysicsList(const G4String& name)
   if (verboseLevel>0) {
     G4cout << "PhysicsList::AddPhysicsList: <" << name << ">" << G4endl;
   }
-  
+
   if (name == fEmName) return;
 
   if (name == "standard") {
@@ -130,7 +131,13 @@ void PhysicsList::AddPhysicsList(const G4String& name)
     fEmName = name;
     delete fEmPhysicsList;
     fEmPhysicsList = new G4EmStandardPhysics();
-            
+
+  } else if (name == "emlivermore_polar") {
+
+    fEmName = name;
+    delete fEmPhysicsList;
+    fEmPhysicsList = new G4EmLivermorePolarizedPhysics();
+
   } else if (name == "polarized") {
 
     fEmName = name;

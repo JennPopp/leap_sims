@@ -218,7 +218,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // Magnet
   //
  auto magnetS
-   = new G4Tubs("Magnet", //Name
+   = new G4Tubs("magnetS", //Name
                0.,         // inner radius
                absrad,     // outer radius
                magthick/2., // half length in z
@@ -229,14 +229,14 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
     = new G4LogicalVolume(
                  magnetS,        // its solid
                  magMat, // its material
-                 "Magnet");          // its name
+                 "magnetLV");          // its name
 
   fMagnetPV
     = new G4PVPlacement(
                  0,                // no rotation
                  G4ThreeVector(0., 0., ZposMag), // its position
                  magnetLV,       // its logical volume
-                 "Magnet",           // its name
+                 "magnetPV",           // its name
                  worldLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number

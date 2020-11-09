@@ -1,6 +1,6 @@
 # Macro file for leap_sims
 #
-/leap_sims/phys/addPhysics polarized
+/leap_sims/phys/addPhysics emlivermore_polar
 
 # Initialize kernel
 /run/initialize

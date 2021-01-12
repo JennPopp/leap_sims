@@ -307,9 +307,13 @@ auto fVacStepS2 = new G4Tubs("VacStep2",  //Name
   //
   worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
 
-  auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
-  simpleBoxVisAtt->SetVisibility(true);
-  magnetLV->SetVisAttributes(simpleBoxVisAtt);
+  auto MagVisAtt= new G4VisAttributes(G4Colour(1.0,0.5,1.0));
+  MagVisAtt->SetVisibility(true);
+  magnetLV->SetVisAttributes(MagVisAtt);
+  
+  auto AbsVisAtt= new G4VisAttributes(G4Colour(0.5,1.0,1.0));
+  AbsVisAtt->SetVisibility(true);
+  absorberLV->SetVisAttributes(AbsVisAtt);
 
   //
   // Always return the physical World

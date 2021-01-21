@@ -121,7 +121,7 @@ RunAction::~RunAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void RunAction::BeginOfRunAction(const G4Run* /*run*/)
+void RunAction::BeginOfRunAction(const G4Run* aRun)
 {
   //inform the runManager to save random number seed
   //G4RunManager::GetRunManager()->SetRandomNumberStore(true);
@@ -131,7 +131,10 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/)
 
   // Open an output file
   //
-  G4String fileName = "results";
+  std :: ostringstream oss;
+  oss << "Result_Run_" << aRun->GetRunID();
+  
+  G4String fileName=oss.str();
   analysisManager->OpenFile(fileName);
 }
 

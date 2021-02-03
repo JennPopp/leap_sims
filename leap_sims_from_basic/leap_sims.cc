@@ -56,7 +56,10 @@ namespace {
            << G4endl;
   }
 }
-
+// argc holds the number of arguments (including the name) on the command line
+// -> it is ONE when only the name is  given !!!
+// argv[0] is always the name of the program
+// argv[1] points to the first argument, and so on
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 int main(int argc,char** argv)

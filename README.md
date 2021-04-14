@@ -14,6 +14,6 @@
   `make`  
   `./leap_sims -m test_run.mac -t 4 >output.txt`  
 
-  -m test_run.mac will run in batch mode und use macro test_run.mac  
-  -t 4 sets the number of threads to 4  
-  >output.txt redirects the output to a textfile called output  
+  `-m test_run.mac` will run in batch mode und use the macro `test_run.mac`  
+  `-t 4` sets the number of threads to 4  
+  `>output.txt` redirects the output to a textfile called output  

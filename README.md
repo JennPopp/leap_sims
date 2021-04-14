@@ -9,7 +9,7 @@
   `mkdir build`  
   `cd build`  
 
- 3.build the application
+ 3.build the application:  
   `/cvmfs/sft.cern.ch/lcg/releases/LCG_97/CMake/3.14.3/x86_64-centos7-gcc8-opt/bin/cmake ../`  
   `make`  
   `./leap_sims -m test_run.mac -t 4 >output.txt`  

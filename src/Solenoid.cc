@@ -1,25 +1,31 @@
 // Solenoid.cc
 #include "Solenoid.hh"
 #include "Materials.hh"
+#include "ConfigReader.hh"
 #include "G4Tubs.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4SystemOfUnits.hh"
 
-Solenoid::Solenoid() : G4VUserDetectorConstruction() {}
+
+Solenoid::Solenoid(const ConfigReader& config) : G4VUserDetectorConstruction() {
+    // Read configuration values and initialize the subdetector
+    fCoreRad = config.GetConfigValueAsDouble("Solenoid", "coreRad")*mm;
+    fCoreLength = config.GetConfigValueAsDouble("Solenoid", "coreLength")*mm;
+}
 
 Solenoid::~Solenoid() {}
 
 G4VPhysicalVolume* Solenoid::Construct() {
     G4Material* iron = Materials::GetInstance()->GetMaterial("G4_Fe");
 
-    G4double coreRad = 25*mm;
-    G4double coreLength = 150*mm;
+    //G4double coreRad = 25*mm;
+    //G4double coreLength = 150*mm;
 
     G4Tubs* solidCore = new G4Tubs("solidCore", // name of the solid 
                                     0.0*mm, // inner radius 
-                                    coreRad, // outer radius 
-                                    coreLength/2, // half length  
+                                    fCoreRad, // outer radius 
+                                    fCoreLength/2, // half length  
                                     0.0*deg, //starting angle 
                                     360.0*deg );// end angle 
 

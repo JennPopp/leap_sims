@@ -28,6 +28,7 @@
 /// \brief Main program of the Common example
 
 #include "DetectorConstruction.hh"
+#include "ConfigReader.hh"
 #include "GeantinoPhysicsList.hh"
 #include "GpsPrimaryGeneratorAction.hh"
 
@@ -45,11 +46,19 @@ int main(int argc,char** argv)
   G4UIExecutive* ui = nullptr;
   if ( argc == 1 ) { ui = new G4UIExecutive(argc, argv); }
 
+  // Read the configuration file 
+  ConfigReader config("config.ini");
+  if (!config.ReadConfig()) {
+      std::cerr << "Failed to read configuration file." << std::endl;
+      return 1;
+  }
+
   // Construct the default run manager
   G4RunManager* runManager = new G4RunManager;
 
+  DetectorConstruction* detector = new DetectorConstruction(config);
   // Set mandatory initialization classes
-  runManager->SetUserInitialization(new DetectorConstruction);
+  runManager->SetUserInitialization(detector);
   runManager->SetUserInitialization(new GeantinoPhysicsList);
 
   // Set mandatory user action class

@@ -12,10 +12,16 @@ namespace leap
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction() {}
+DetectorConstruction::DetectorConstruction(const ConfigReader& config) 
+  : G4VUserDetectorConstruction(),fConfig(config) {
+    // Create instances of subdetectors and pass the confic object
+    fSolenoid = new Solenoid(config);
+  }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-DetectorConstruction::~DetectorConstruction() {}
+DetectorConstruction::~DetectorConstruction() {
+  delete fSolenoid; 
+}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4VPhysicalVolume* DetectorConstruction::Construct() {
@@ -29,9 +35,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
 
   // Place the solenoid into the world 
   // create an instance of the solenoid class
-  Solenoid solenoid;
 
-  G4VPhysicalVolume* solenoidVolume = solenoid.Construct();
+  G4VPhysicalVolume* solenoidVolume = fSolenoid->Construct();
   new G4PVPlacement(0,
                     G4ThreeVector(), 
                     solenoidVolume->GetLogicalVolume(), 

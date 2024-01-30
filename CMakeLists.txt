@@ -48,6 +48,7 @@ target_link_libraries(leap_sims ${Geant4_LIBRARIES} )
 set(LEAP_SIMS_SCRIPTS
     vis.mac
     init_vis.mac
+    config.ini
   )
 
 foreach(_script ${LEAP_SIMS_SCRIPTS})

@@ -46,35 +46,13 @@ namespace leap
 class DetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-    DetectorConstruction(
-       const G4String& boxMaterialName = "G4_AIR",
-       G4double boxHx = 40*CLHEP::cm,
-       G4double boxHy = 40*CLHEP::cm,
-       G4double boxHz = 40*CLHEP::cm,
-       const G4String& worldMaterialName = "G4_AIR",
-       G4double worldSizeFactor = 1.25);
+    DetectorConstruction();
     ~DetectorConstruction() override;
 
   public:
     // methods from base class
     G4VPhysicalVolume* Construct() override;
 
-    // set methods
-    void  SetBoxMaterial(const G4String& materialName);
-    void  SetWorldMaterial(const G4String& materialName);
-    void  SetBoxDimensions(G4ThreeVector dimensions);
-    void  SetWorldSizeFactor(G4double factor);
-
-  private:
-    void DefineCommands();
-
-    G4GenericMessenger*  fMessenger = nullptr;
-    G4String             fBoxMaterialName;
-    G4String             fWorldMaterialName;
-    G4ThreeVector        fBoxDimensions;
-    G4double             fWorldSizeFactor = 0.;
-    G4LogicalVolume*     fBoxVolume = nullptr;
-    G4LogicalVolume*     fWorldVolume = nullptr;
 };
 
 }

@@ -23,33 +23,38 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+/// \file polarisation/Pol01/include/StepMaxMessenger.hh
+/// \brief Definition of the StepMaxMessenger class
 //
-/// \file common/include/GeantinoPhysicsList.hh
-/// \brief Definition of the Common::GeantinoPhysicsList class
+// $Id: StepMaxMessenger.hh 98772 2016-08-09 14:25:31Z gcosmo $
+//
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef GeantinoPhysicsList_h
-#define GeantinoPhysicsList_h 1
+#ifndef StepMaxMessenger_h
+#define StepMaxMessenger_h 1
 
-#include "G4VUserPhysicsList.hh"
+#include "G4UImessenger.hh"
+#include "globals.hh"
 
-namespace leap
-{
+class StepMax;
+class G4UIcmdWithADoubleAndUnit;
 
-/// Physics list with geantino and charged geantino only
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class GeantinoPhysicsList: public G4VUserPhysicsList
+class StepMaxMessenger: public G4UImessenger
 {
   public:
-    GeantinoPhysicsList();
-    ~GeantinoPhysicsList() override;
-
-  protected:
-    // Construct particle and physics process
-    void ConstructParticle() override;
-    void ConstructProcess() override;
+    StepMaxMessenger(StepMax*);
+   ~StepMaxMessenger();
+    
+    virtual void SetNewValue(G4UIcommand*, G4String);
+    
+  private:
+    StepMax* fStepMax;
+    G4UIcmdWithADoubleAndUnit* fStepMaxCmd;
 };
 
-}
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-

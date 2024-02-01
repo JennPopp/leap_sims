@@ -23,47 +23,39 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+/// \file polarisation/Pol01/include/PhysListEmPolarized.hh
+/// \brief Definition of the PhysListEmPolarized class
 //
-/// \file common/src/GeantinoPhysicsList.cc
-/// \brief Implementation of the Common::GeantinoPhysicsList class
+//
+// $Id: PhysListEmPolarized.hh 98772 2016-08-09 14:25:31Z gcosmo $
+//
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "GeantinoPhysicsList.hh"
-#include "G4Geantino.hh"
-#include "G4ChargedGeantino.hh"
+#ifndef PhysListEmPolarized_h
+#define PhysListEmPolarized_h 1
 
-namespace leap
+#include "G4VPhysicsConstructor.hh"
+#include "globals.hh"
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+class PhysListEmPolarized : public G4VPhysicsConstructor
 {
+  public: 
+    PhysListEmPolarized(const G4String& name = "polarized");
+   ~PhysListEmPolarized();
+
+  public: 
+    // This method is dummy for physics
+    virtual void ConstructParticle() {};
+ 
+    // This method will be invoked in the Construct() method.
+    // each physics process will be instantiated and
+    // registered to the process manager of each particle type 
+    virtual void ConstructProcess();
+};
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-GeantinoPhysicsList::GeantinoPhysicsList() = default;
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-GeantinoPhysicsList::~GeantinoPhysicsList() = default;
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void GeantinoPhysicsList::ConstructParticle()
-{
-  // In this method, static member functions should be called
-  // for all particles which you want to use.
-  // This ensures that objects of these particle types will be
-  // created in the program.
-
-  G4Geantino::GeantinoDefinition();
-  G4ChargedGeantino::ChargedGeantinoDefinition();
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void GeantinoPhysicsList::ConstructProcess()
-{
-  // Define transportation process
-
-  AddTransportation();
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-}
+#endif

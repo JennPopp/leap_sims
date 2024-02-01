@@ -13,6 +13,8 @@
 
 #include "G4PolarizationManager.hh"
 
+#include "G4VisAttributes.hh"
+#include "G4Colour.hh"
 
 Solenoid::Solenoid(const ConfigReader& config) : G4VUserDetectorConstruction() {
     // Read configuration values and initialize the subdetector
@@ -20,6 +22,7 @@ Solenoid::Solenoid(const ConfigReader& config) : G4VUserDetectorConstruction() {
     fCoreLength = config.GetConfigValueAsDouble("Solenoid", "coreLength")*mm;
     fConvThick = config.GetConfigValueAsDouble("Solenoid", "convThick")*mm;
     fPolStatus = config.GetConfigValue("PhysicsList", "polarizationStatus");
+    //fBeamLineStatus = config.GetConfigValue("BeamLine", "beamLineStatus");
     fType = config.GetConfigValue("Solenoid", "type");
     fWorldMaterial = config.GetConfigValue("World", "material");
 }
@@ -87,6 +90,8 @@ G4VPhysicalVolume* Solenoid::Construct() {
                       0,         //its mother volume
                       false,              //no boolean operation
                       0);                 //copy number
+
+    logicSolenoid->SetVisAttributes(G4VisAttributes::GetInvisible());
     //---------------------------------------------------------------
     // housing of the solenoid
     //---------------------------------------------------------------
@@ -115,6 +120,10 @@ G4VPhysicalVolume* Solenoid::Construct() {
                       false,              //no boolean operation
                       0);                 //copy number
 
+    G4VisAttributes * MagnetVis= new G4VisAttributes( G4Colour(255/255. ,102/255. ,102/255. ));
+    MagnetVis->SetVisibility(true);
+    MagnetVis->SetLineWidth(1);
+    logicMagnet->SetVisAttributes(MagnetVis);
     //---------------------------------------------------------------
     // copper coils 
     //---------------------------------------------------------------
@@ -137,7 +146,69 @@ G4VPhysicalVolume* Solenoid::Construct() {
              logicMagnet,     // its mother volume
              false,              // no boolean operation
              0);
+    G4VisAttributes * CopperCoilVis= new G4VisAttributes( G4Colour(255/255. ,0/255. ,255/255. ));
+    CopperCoilVis->SetVisibility(true);
+    CopperCoilVis->SetLineWidth(1);
+    logicCuTube->SetVisAttributes(CopperCoilVis);
+    //---------------------------------------------------------------
+    // lead shielding 
+    //---------------------------------------------------------------
 
+    G4Tubs* solidPbTube= new G4Tubs("solidPbTube", // name
+                                    fCoreRad, // inner radius
+                                    shieldRad, // outer radius
+                                    shieldThick/2., // half length in z
+                                    0.0*deg, // start angle
+                                    360.0*deg ); // total angle
+
+    G4LogicalVolume* logicPbTube = new G4LogicalVolume(solidPbTube, 	 //its solid
+    						lead, 		 //its material
+    						"PbTube" ,		 //its name
+    						0,0,0);
+
+    new G4PVPlacement(0,	//rotation
+    				G4ThreeVector(0.0*mm, 0.0*mm, 0.0*mm),
+    				logicPbTube,      //its logical volume
+    			    "PhysicalPbTube",   //its name  (2nd constructor)
+    			    logicMagnet,     //its mother volume
+    			    false,              //no boolean operation
+    			    0);                 //copy number
+
+    G4VisAttributes * LeadTubeVis= new G4VisAttributes( G4Colour(0/255. ,102/255. ,204/255. ));
+    LeadTubeVis->SetVisibility(true);
+    LeadTubeVis->SetLineWidth(1);
+    logicPbTube->SetVisAttributes(LeadTubeVis);
+
+    //---------------------------------------------------------------
+    // conversion target
+    //---------------------------------------------------------------
+    if (fConvThick > 0){
+        G4Tubs* solidConversion = new G4Tubs("solidConversion", // name
+                                          0.0*mm, // inner radius
+                                          fCoreRad, // outer radius
+                                          fConvThick/2., // half length in z
+                                          0.0*deg, // starting angle
+                                          360.0*deg ); // total angle
+
+      G4LogicalVolume* logicConversion = new G4LogicalVolume(solidConversion, 	 //its solid
+                  tungsten,          //its material
+                  "ConversionTarget" ,	 //its name
+                  0,0,0);
+
+      new G4PVPlacement(0,	//rotation
+                  G4ThreeVector(0.0*mm, 0.0*mm, -coreGap-fConvThick/2-fCoreLength/2),
+                logicConversion,         //its logical volume
+                "PhysicalConversion",   //its name  (2nd constructor)
+                logicSolenoid,              //its mother volume
+                false,                 //no boolean operation
+                0);                       //copy number
+
+      G4VisAttributes * ConversionTargetVis= new G4VisAttributes( G4Colour(105/255. ,105/255. ,105/255. ));
+      ConversionTargetVis->SetVisibility(true);
+      ConversionTargetVis->SetLineWidth(2);
+      ConversionTargetVis->SetForceSolid(true);
+      logicConversion->SetVisAttributes(ConversionTargetVis);
+    }
     //---------------------------------------------------------------
     // iron core 
     //---------------------------------------------------------------
@@ -169,6 +240,10 @@ G4VPhysicalVolume* Solenoid::Construct() {
     else{
         G4cout << "YOU ARE NOT USING POLARIZATION !!!!!" << G4endl;
     }
-
+    G4VisAttributes * IronCoreVis= new G4VisAttributes( G4Colour(51/255. ,51/255. ,255/255. ));
+    IronCoreVis->SetVisibility(true);
+    IronCoreVis->SetLineWidth(2);
+    IronCoreVis->SetForceSolid(true);
+    logicCore->SetVisAttributes(IronCoreVis);
     return physSolenoid;
 }

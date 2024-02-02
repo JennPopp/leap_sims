@@ -33,6 +33,7 @@
 #include "G4GeneralParticleSource.hh"
 #include "G4SystemOfUnits.hh"
 
+
 namespace leap
 {
 
@@ -54,7 +55,7 @@ GpsPrimaryGeneratorAction::~GpsPrimaryGeneratorAction()
 
 void GpsPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-  // this function is called at the beginning of event
+  // this function is called at the begining of event
 
   fGeneralParticleSource->GeneratePrimaryVertex(anEvent);
 }

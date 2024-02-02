@@ -30,6 +30,7 @@
 #include "DetectorConstruction.hh"
 #include "ConfigReader.hh"
 #include "PhysicsList.hh"
+#include "MacroGenerator.hh"
 #include "GpsPrimaryGeneratorAction.hh"
 
 #include "G4RunManager.hh"
@@ -52,6 +53,9 @@ int main(int argc,char** argv)
       std::cerr << "Failed to read configuration file." << std::endl;
       return 1;
   }
+  
+  G4String fileName = argv[1];
+  MacroGenerator::generateMacro(config, fileName);
 
   // Construct the default run manager
   G4RunManager* runManager = new G4RunManager;
@@ -64,7 +68,7 @@ int main(int argc,char** argv)
   runManager->SetUserInitialization(physList);
 
   // Set mandatory user action class
-  runManager->SetUserAction(new GpsPrimaryGeneratorAction);
+  runManager->SetUserAction(new GpsPrimaryGeneratorAction());
 
   // Initialize visualization
   //
@@ -81,7 +85,6 @@ int main(int argc,char** argv)
   if ( ! ui ) {
     // batch mode
     G4String command = "/control/execute ";
-    G4String fileName = argv[1];
     UImanager->ApplyCommand(command+fileName);
   }
   else {

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include "G4ThreeVector.hh"
 
 ConfigReader::ConfigReader(const std::string& configFile)
     : fConfigFile(configFile) {}
@@ -68,4 +69,29 @@ double ConfigReader::GetConfigValueAsDouble(const std::string& section, const st
         std::cerr << "Out of range: " << e.what() << std::endl;
     }
     return 0.0; // Default value or throw an exception
+}
+G4ThreeVector ConfigReader::GetConfigValueAsG4ThreeVector(const std::string& section, const std::string& key) const {
+    std::string valueStr = GetConfigValue(section, key);
+    std::istringstream iss(valueStr);
+
+    double x, y, z;
+    iss >> x >> y >> z;
+
+    if (iss.fail()) {
+        std::cerr << "Failed to parse G4ThreeVector for " << section << ":" << key << std::endl;
+        return G4ThreeVector(); // Return a default vector or handle the error appropriately
+    }
+
+    return G4ThreeVector(x, y, z);
+}
+
+int ConfigReader::GetConfigValueAsInt(const std::string& section, const std::string& key) const {
+    std::string valueStr = GetConfigValue(section, key);
+    std::istringstream iss(valueStr);
+    int value;
+    if (!(iss >> value)) {
+        std::cerr << "Error: Failed to convert [" << section << "] " << key << " to int: " << valueStr << std::endl;
+        return 0; // Return a default value or handle the error as needed
+    }
+    return value;
 }

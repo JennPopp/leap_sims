@@ -25,6 +25,7 @@ Solenoid::Solenoid(const ConfigReader& config) : G4VUserDetectorConstruction() {
     //fBeamLineStatus = config.GetConfigValue("BeamLine", "beamLineStatus");
     fType = config.GetConfigValue("Solenoid", "type");
     fWorldMaterial = config.GetConfigValue("World", "material");
+    fPolDeg = config.GetConfigValueAsDouble("GPS","polDeg");
 }
 
 Solenoid::~Solenoid() {}
@@ -235,7 +236,7 @@ G4VPhysicalVolume* Solenoid::Construct() {
     if (fPolStatus == "On"){
         // register logical Volume in PolarizationManager with polarization
         G4PolarizationManager * polMgr = G4PolarizationManager::GetInstance();
-        polMgr->SetVolumePolarization(logicCore,G4ThreeVector(0.,0.,1.));
+        polMgr->SetVolumePolarization(logicCore,G4ThreeVector(0.,0.,fPolDeg));
     }
     else{
         G4cout << "YOU ARE NOT USING POLARIZATION !!!!!" << G4endl;

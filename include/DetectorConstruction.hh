@@ -9,7 +9,7 @@
 namespace leap
 {
 
-/// Simple detector construction with a box volume placed in a world
+
 
 class DetectorConstruction : public G4VUserDetectorConstruction
 {

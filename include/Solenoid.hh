@@ -19,6 +19,7 @@ private:
     G4double fCoreRad;
     G4double fCoreLength;
     G4double fConvThick; 
+    G4double fPolDeg;
     G4String fType; // TP1 was used for design study, TP2 is in the lab
     G4String fPolStatus;
     //G4String fBeamLineStatus;

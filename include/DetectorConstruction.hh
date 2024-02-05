@@ -19,6 +19,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 
     // methods from base class
     G4VPhysicalVolume* Construct() override;
+    virtual void ConstructSDandField() override;
 
   private:
     // Configuration reader

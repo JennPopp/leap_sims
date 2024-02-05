@@ -2,6 +2,7 @@
 #include "DetectorConstruction.hh"
 #include "Solenoid.hh"
 #include "Materials.hh"
+
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4Box.hh"
@@ -47,4 +48,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
 
   return physWorld;
 }
+
+void DetectorConstruction::ConstructSDandField(){
+  fSolenoid->ConstructSolenoidSD();
 }
+} // namespace leap

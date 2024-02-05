@@ -54,8 +54,11 @@ int main(int argc,char** argv)
       return 1;
   }
   
-  G4String fileName = argv[1];
-  MacroGenerator::generateMacro(config, fileName);
+  G4String fileName = "";
+  if (argc > 1) {
+      fileName = argv[1];
+      MacroGenerator::generateMacro(config, fileName);
+  }
 
   // Construct the default run manager
   G4RunManager* runManager = new G4RunManager;
@@ -76,6 +79,9 @@ int main(int argc,char** argv)
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
   // G4VisManager* visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
+
+  // Initialize the run manager 
+  runManager->Initialize();
 
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();

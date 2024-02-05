@@ -2,6 +2,7 @@
 #include "Solenoid.hh"
 #include "Materials.hh"
 #include "ConfigReader.hh"
+#include "BaseSensitiveDetector.hh"
 
 #include "G4Tubs.hh"
 #include "G4Polycone.hh"
@@ -12,6 +13,7 @@
 #include "G4Exception.hh"
 
 #include "G4PolarizationManager.hh"
+#include "G4SDManager.hh"
 
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
@@ -39,7 +41,8 @@ G4VPhysicalVolume* Solenoid::Construct() {
     G4double coneLength = 50.0*mm;
     G4double coilThick = fCoreLength + 25.0*mm;
     G4double shieldThick = fCoreLength - 25*mm;
-    G4double coreGap = 12.5*mm; // TP2: dist core and cone TP1: dist core and conv
+    G4double coreGap = 12.5*mm;
+    G4double vacThick = 1*mm; // TP2: dist core and cone TP1: dist core and conv
     
     G4double rMax, rOpen, rOuterCoil, coneDist, magThick;
     if (fType == "TP2"){
@@ -246,5 +249,60 @@ G4VPhysicalVolume* Solenoid::Construct() {
     IronCoreVis->SetLineWidth(2);
     IronCoreVis->SetForceSolid(true);
     logicCore->SetVisAttributes(IronCoreVis);
+
+    //---------------------------------------------------------------------
+    // vacuum steps aka ideal detector volumes 
+    //---------------------------------------------------------------------
+    // As they have the same geometry, both can use the same solid
+    G4Tubs* solidVacStep =new G4Tubs("solidVacStep",  //Name
+                                0.,         // inner radius
+                                fCoreRad,     // outer radius
+                                vacThick/2., // half length in z
+                                0.0*deg,    // starting phi angle
+                                360.0*deg); // angle of the segment
+
+    // the first one after converter in front of iron core 
+    fLogicVacStep1 = new G4LogicalVolume(solidVacStep,    //its solid
+                                           Materials::GetInstance()->GetMaterial(fWorldMaterial),    //its material
+                                           "logicVacStep1");  //its name
+
+    new G4PVPlacement(0,                 //no rotation
+                         G4ThreeVector(0.,0., - fCoreLength/2 -coreGap +vacThick/2 +1.0*mm),    //its position
+                                 fLogicVacStep1,            //its logical volume
+                                 "physVacStep1",                 //its name
+                                 logicSolenoid,               //its mother
+                                 false,                     //no boolean operat
+                                 0);                        //copy number
+
+    // the second behind iron core 
+    fLogicVacStep2 = new G4LogicalVolume(solidVacStep,    //its solid
+                                           Materials::GetInstance()->GetMaterial(fWorldMaterial),    //its material
+                                           "logicVacStep2");  //its name
+
+    new G4PVPlacement(0,                 //no rotation
+                      G4ThreeVector(0.,0.,fCoreLength/2 + vacThick/2 + 10.0*mm),    //its position
+                      fLogicVacStep2,            //its logical volume
+                      "physVacStep1",                 //its name
+                      logicSolenoid,               //its mother
+                      false,                     //no boolean operat
+                      0);                        //copy number
+
+
     return physSolenoid;
+}
+
+void Solenoid::ConstructSolenoidSD() {
+    // Instantiate and register SDs for this subdetector
+    // ante nucleum ferreum -> vor dem Eisenkern -> in front of the iron core
+    // post                 -> hinter dem Eisenkern -> at the rear of the iron core
+    auto sdAN = new BaseSensitiveDetector("SDAN", "anteNucleum");
+    G4SDManager::GetSDMpointer()->AddNewDetector(sd1);
+    // Retrieve the logical volume for this layer and set its SD
+    // G4LogicalVolume* logicalVolumeLayer1 = ...;
+    fLogicVacStep1->SetSensitiveDetector(sd1);
+    // Repeat for other layers within this subdetector
+
+    auto sdPN = new BaseSensitiveDetector("SDPN", "postNucleum");
+    G4SDManager::GetSDMpointer()->AddNewDetector(sd2);
+    fLogicVacStep1->SetSensitiveDetector(sd2);
 }

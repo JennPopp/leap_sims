@@ -14,6 +14,7 @@ public:
     ~Solenoid();
     // Other public methods and member variables 
     G4VPhysicalVolume* Construct();
+    void ConstructSolenoidSD();
 
 private:
     G4double fCoreRad;
@@ -24,6 +25,8 @@ private:
     G4String fPolStatus;
     //G4String fBeamLineStatus;
     G4String fWorldMaterial;
+    G4LogicalVolume* fLogicVacStep1;
+    G4LogicalVolume* fLogicVacStep2;
 };
 
 #endif

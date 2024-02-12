@@ -17,12 +17,13 @@ public:
     void ConstructSolenoidSD();
 
 private:
+    const ConfigReader& fConfig;
     G4double fCoreRad;
     G4double fCoreLength;
     G4double fConvThick; 
     G4double fPolDeg;
     G4String fType; // TP1 was used for design study, TP2 is in the lab
-    G4String fPolStatus;
+    G4int fPolStatus;
     //G4String fBeamLineStatus;
     G4String fWorldMaterial;
     G4LogicalVolume* fLogicVacStep1;

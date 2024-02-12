@@ -2,6 +2,8 @@
 #include "DetectorConstruction.hh"
 #include "Solenoid.hh"
 #include "Materials.hh"
+#include "ConfigReader.hh"
+
 
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
@@ -36,20 +38,23 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
 
   // Place the solenoid into the world 
   // create an instance of the solenoid class
-
-  G4VPhysicalVolume* solenoidVolume = fSolenoid->Construct();
-  new G4PVPlacement(0,
-                    G4ThreeVector(), 
-                    solenoidVolume->GetLogicalVolume(), 
-                    solenoidVolume->GetName(), 
-                    logicWorld, 
-                    false, 
-                    0);
+  if (fConfig.GetConfigValueAsInt("Solenoid","solenoidStatus")){
+    G4VPhysicalVolume* solenoidVolume = fSolenoid->Construct();
+    new G4PVPlacement(0,
+                      G4ThreeVector(), 
+                      solenoidVolume->GetLogicalVolume(), 
+                      solenoidVolume->GetName(), 
+                      logicWorld, 
+                      false, 
+                      0); 
+  }
 
   return physWorld;
 }
 
 void DetectorConstruction::ConstructSDandField(){
-  fSolenoid->ConstructSolenoidSD();
+  if (fConfig.GetConfigValueAsInt("Solenoid","solenoidStatus")){
+    fSolenoid->ConstructSolenoidSD();
+  } 
 }
 } // namespace leap

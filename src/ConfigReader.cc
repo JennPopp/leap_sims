@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include <exception>
 #include "G4ThreeVector.hh"
 
 ConfigReader::ConfigReader(const std::string& configFile)
@@ -94,4 +95,81 @@ int ConfigReader::GetConfigValueAsInt(const std::string& section, const std::str
         return 0; // Return a default value or handle the error as needed
     }
     return value;
+}
+
+std::string ConfigReader::GetOutputMode() const {
+        
+        try {
+            std::string     mode = GetConfigValue("Output", "mode");
+            if (!mode.empty()) {
+                return mode;
+            }
+        } catch (const std::exception& e) {
+            // Handle the exception if needed, e.g., logging the error message
+        }
+        return "summary"; // default value
+    }
+
+std::vector<TreeInfo> ConfigReader::GetTreesInfo() const {
+    // Logic to read tree configurations from fConfigValues
+
+    // declare the tree vector 
+    std::vector<TreeInfo> trees;
+
+    // check all the geometry and detector states 
+    // for now just Solenoid 
+    G4int solenoidStatus = GetConfigValueAsInt("Solenoid","solenoidStatus");
+    if (solenoidStatus){
+        G4int ICdet = GetConfigValueAsInt("Solenoid","inFrontCoreDet");
+        if (ICdet){
+            trees.push_back(TreeInfo("inFrontCore", "inFrontCore", 0));
+        }
+        if (GetConfigValueAsInt("Solenoid","behindCoreDet")){
+            trees.push_back(TreeInfo("behindCoreDet","behindCore",ICdet));
+        }
+    }
+
+    return trees;
+}
+
+std::vector<BranchInfo> ConfigReader::GetBranchesInfo(const std::string& treeName) const {
+    std::vector<BranchInfo> branches;
+    
+    std::string mode = GetOutputMode();
+
+    //later I will use the name to check whether It gets
+    // the standart currently below or calo info  
+
+    if (mode == "detailed"){
+        branches = {
+            {"pdg", "I"},
+            {"E", "D"},
+            {"x", "D"},
+            {"y", "D"},
+            {"z", "D"},
+            {"startx", "D"},
+            {"starty", "D"},
+            {"startz", "D"},
+            {"px", "D"},
+            {"py", "D"},
+            {"pz", "D"},
+            {"Polx", "D"},
+            {"Poly", "D"},
+            {"Polz", "D"},
+            {"TrackID", "D"},
+            {"ParentID", "D"},
+            {"EventID", "D"}
+        };
+    }else{ // use summary mode
+        branches = {
+            {"Esum", "D"},
+            {"NP", "I"},
+            {"EGammaSum", "D"},
+            {"NGamma", "I"},
+            {"EeSum", "D"},
+            {"Ne", "I"}
+        };
+    }
+
+    return branches;
 }

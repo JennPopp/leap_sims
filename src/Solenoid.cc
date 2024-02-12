@@ -3,6 +3,7 @@
 #include "Materials.hh"
 #include "ConfigReader.hh"
 #include "BaseSensitiveDetector.hh"
+#include "RunAction.hh"
 
 #include "G4Tubs.hh"
 #include "G4Polycone.hh"
@@ -12,18 +13,20 @@
 
 #include "G4Exception.hh"
 
+#include "G4RunManager.hh"
 #include "G4PolarizationManager.hh"
 #include "G4SDManager.hh"
 
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
-Solenoid::Solenoid(const ConfigReader& config) : G4VUserDetectorConstruction() {
+Solenoid::Solenoid(const ConfigReader& config)
+  : G4VUserDetectorConstruction(), fConfig(config) {
     // Read configuration values and initialize the subdetector
     fCoreRad = config.GetConfigValueAsDouble("Solenoid", "coreRad")*mm;
     fCoreLength = config.GetConfigValueAsDouble("Solenoid", "coreLength")*mm;
     fConvThick = config.GetConfigValueAsDouble("Solenoid", "convThick")*mm;
-    fPolStatus = config.GetConfigValue("PhysicsList", "polarizationStatus");
+    fPolStatus = config.GetConfigValueAsInt("PhysicsList", "polarizationStatus");
     //fBeamLineStatus = config.GetConfigValue("BeamLine", "beamLineStatus");
     fType = config.GetConfigValue("Solenoid", "type");
     fWorldMaterial = config.GetConfigValue("World", "material");
@@ -236,7 +239,7 @@ G4VPhysicalVolume* Solenoid::Construct() {
                       false, // no boolean operation
                       0); // copy number 
 
-    if (fPolStatus == "On"){
+    if (fPolStatus == 1){
         // register logical Volume in PolarizationManager with polarization
         G4PolarizationManager * polMgr = G4PolarizationManager::GetInstance();
         polMgr->SetVolumePolarization(logicCore,G4ThreeVector(0.,0.,fPolDeg));
@@ -292,17 +295,36 @@ G4VPhysicalVolume* Solenoid::Construct() {
 }
 
 void Solenoid::ConstructSolenoidSD() {
-    // Instantiate and register SDs for this subdetector
-    // ante nucleum ferreum -> vor dem Eisenkern -> in front of the iron core
-    // post                 -> hinter dem Eisenkern -> at the rear of the iron core
-    auto sdAN = new BaseSensitiveDetector("SDAN", "anteNucleum");
-    G4SDManager::GetSDMpointer()->AddNewDetector(sd1);
-    // Retrieve the logical volume for this layer and set its SD
-    // G4LogicalVolume* logicalVolumeLayer1 = ...;
-    fLogicVacStep1->SetSensitiveDetector(sd1);
-    // Repeat for other layers within this subdetector
 
-    auto sdPN = new BaseSensitiveDetector("SDPN", "postNucleum");
-    G4SDManager::GetSDMpointer()->AddNewDetector(sd2);
-    fLogicVacStep1->SetSensitiveDetector(sd2);
+    // Retrieve the current RunAction instance
+    const auto runAction = static_cast<const RunAction*>(G4RunManager::GetRunManager()->GetUserRunAction());
+    
+    // Instantiate and register SDs for this subdetector
+    // IC: in front of the iron core
+    // BC: behind the iron core
+    if (runAction!=nullptr && fConfig.GetConfigValueAsInt("Solenoid","inFrontCoreDet")){
+      std::string ntupleName = "inFrontCore";
+      auto& mapping = runAction->GetNtupleNameToIdMap();
+      auto it = mapping.find(ntupleName);
+      int ID = it->second;
+     
+      auto sdIC = new BaseSensitiveDetector("SDIC", ntupleName, ID);
+      G4SDManager::GetSDMpointer()->AddNewDetector(sdIC );
+      // Retrieve the logical volume for this layer and set its SD
+      fLogicVacStep1->SetSensitiveDetector(sdIC );
+    
+    }
+    
+    
+    // Repeat for other layers within this subdetector
+    if (runAction!=nullptr && fConfig.GetConfigValueAsInt("Solenoid","behindCoreDet")){
+      std::string ntupleName = "behindCore";
+      auto& mapping = runAction->GetNtupleNameToIdMap();
+      auto it = mapping.find(ntupleName);
+      int ID = it->second;
+      auto sdBC = new BaseSensitiveDetector("SDBC", ntupleName, ID);
+      G4SDManager::GetSDMpointer()->AddNewDetector(sdBC);
+      fLogicVacStep1->SetSensitiveDetector(sdBC);
+    }
 }
+

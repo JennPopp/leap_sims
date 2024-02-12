@@ -14,12 +14,12 @@ PhysicsList::PhysicsList(const ConfigReader& config)
 : G4VModularPhysicsList(),fConfig(config),
   fEmPhysicsList(0), fOptPhysicsList(0)
 {
-  fPolStatus = config.GetConfigValue("PhysicsList", "polarizationStatus");
-  fOptStatus = config.GetConfigValue("PhysicsList", "opticalStatus");
+  fPolStatus = config.GetConfigValueAsInt("PhysicsList", "polarizationStatus");
+  fOptStatus = config.GetConfigValueAsInt("PhysicsList", "opticalStatus");
   G4EmParameters::Instance();
 
   SetVerboseLevel(1);
-  if (fPolStatus=="On"){
+  if (fPolStatus==1){
     fEmPhysicsList = new PhysListEmPolarized();
   }else{
     fEmPhysicsList = new G4EmStandardPhysics();
@@ -86,7 +86,7 @@ void PhysicsList::ConstructProcess()
   fEmPhysicsList->ConstructProcess();
 
   // Optical processes just active if Calorimeter is in use (have to check if this is necessary)
-  if(fOptStatus == "On"){
+  if(fOptStatus == 1){
   fOptPhysicsList->ConstructProcess();
   }
 

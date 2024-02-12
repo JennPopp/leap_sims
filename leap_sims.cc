@@ -30,6 +30,8 @@
 #include "DetectorConstruction.hh"
 #include "ConfigReader.hh"
 #include "PhysicsList.hh"
+#include "RunAction.hh"
+#include "EventAction.hh"
 #include "MacroGenerator.hh"
 #include "GpsPrimaryGeneratorAction.hh"
 
@@ -72,16 +74,19 @@ int main(int argc,char** argv)
 
   // Set mandatory user action class
   runManager->SetUserAction(new GpsPrimaryGeneratorAction());
-
-  // Initialize visualization
-  //
-  G4VisManager* visManager = new G4VisExecutive;
-  // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-  // G4VisManager* visManager = new G4VisExecutive("Quiet");
-  visManager->Initialize();
+  runManager->SetUserAction(new RunAction());
+  runManager->SetUserAction(new EventAction());
 
   // Initialize the run manager 
   runManager->Initialize();
+
+// Initialize visualization
+  //
+  //G4VisManager* visManager = new G4VisExecutive;
+  // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
+  G4VisManager* visManager = new G4VisExecutive("Quiet");
+  visManager->Initialize();
+
 
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();

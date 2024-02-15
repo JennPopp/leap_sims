@@ -97,7 +97,7 @@ int ConfigReader::GetConfigValueAsInt(const std::string& section, const std::str
     return value;
 }
 
-std::string ConfigReader::GetOutputMode() const {
+std::string ConfigReader::ReadOutputMode() const {
         
         try {
             std::string     mode = GetConfigValue("Output", "mode");
@@ -110,7 +110,7 @@ std::string ConfigReader::GetOutputMode() const {
         return "summary"; // default value
     }
 
-std::vector<TreeInfo> ConfigReader::GetTreesInfo() const {
+std::vector<TreeInfo> ConfigReader::ReadTreesInfo() const {
     // Logic to read tree configurations from fConfigValues
 
     // declare the tree vector 
@@ -118,24 +118,29 @@ std::vector<TreeInfo> ConfigReader::GetTreesInfo() const {
 
     // check all the geometry and detector states 
     // for now just Solenoid 
+
+    G4cout << "GetTreesInfo() is called" << G4endl;
     G4int solenoidStatus = GetConfigValueAsInt("Solenoid","solenoidStatus");
     if (solenoidStatus){
-        G4int ICdet = GetConfigValueAsInt("Solenoid","inFrontCoreDet");
+        G4int ICdet = GetConfigValueAsInt("Solenoid","inFrontCore");
+        G4cout << "The detector in front of the core of the Solenoid has status "<< ICdet << G4endl;
         if (ICdet){
             trees.push_back(TreeInfo("inFrontCore", "inFrontCore", 0));
         }
-        if (GetConfigValueAsInt("Solenoid","behindCoreDet")){
-            trees.push_back(TreeInfo("behindCoreDet","behindCore",ICdet));
+        G4int bCDet = GetConfigValueAsInt("Solenoid","behindCore");
+        G4cout << "The detector behind the core of the Solenoid has status "<< bCDet << G4endl;
+        if (bCDet){
+            trees.push_back(TreeInfo("behindCore","behindCore",bCDet));
         }
     }
-
+    G4cout << "trees size: " << trees.size() << G4endl;
     return trees;
 }
 
 std::vector<BranchInfo> ConfigReader::GetBranchesInfo(const std::string& treeName) const {
     std::vector<BranchInfo> branches;
     
-    std::string mode = GetOutputMode();
+    std::string mode = ReadOutputMode();
 
     //later I will use the name to check whether It gets
     // the standart currently below or calo info  
@@ -172,4 +177,8 @@ std::vector<BranchInfo> ConfigReader::GetBranchesInfo(const std::string& treeNam
     }
 
     return branches;
+}
+
+const std::map<std::string, std::map<std::string, std::string>>& ConfigReader::GetConfigValues() const {
+    return fConfigValues;
 }

@@ -3,7 +3,7 @@
 #include "Materials.hh"
 #include "ConfigReader.hh"
 #include "BaseSensitiveDetector.hh"
-#include "RunAction.hh"
+#include "AnaConfigManager.hh"
 
 #include "G4Tubs.hh"
 #include "G4Polycone.hh"
@@ -20,8 +20,16 @@
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
-Solenoid::Solenoid(const ConfigReader& config)
-  : G4VUserDetectorConstruction(), fConfig(config) {
+#include <iostream>
+
+// ANSI escape code for red text
+const std::string red = "\033[31m";
+
+// ANSI escape code to reset text color
+const std::string reset = "\033[0m";
+
+Solenoid::Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManager)
+  : G4VUserDetectorConstruction(), fConfig(config), fAnaConfigManager(anaConfigManager) {
     // Read configuration values and initialize the subdetector
     fCoreRad = config.GetConfigValueAsDouble("Solenoid", "coreRad")*mm;
     fCoreLength = config.GetConfigValueAsDouble("Solenoid", "coreLength")*mm;
@@ -295,36 +303,47 @@ G4VPhysicalVolume* Solenoid::Construct() {
 }
 
 void Solenoid::ConstructSolenoidSD() {
-
-    // Retrieve the current RunAction instance
-    const auto runAction = static_cast<const RunAction*>(G4RunManager::GetRunManager()->GetUserRunAction());
     
     // Instantiate and register SDs for this subdetector
     // IC: in front of the iron core
     // BC: behind the iron core
-    if (runAction!=nullptr && fConfig.GetConfigValueAsInt("Solenoid","inFrontCoreDet")){
+    if (fConfig.GetConfigValueAsInt("Solenoid","inFrontCore")){
       std::string ntupleName = "inFrontCore";
-      auto& mapping = runAction->GetNtupleNameToIdMap();
+      auto& mapping = fAnaConfigManager.GetNtupleNameToIdMap();
       auto it = mapping.find(ntupleName);
-      int ID = it->second;
-     
-      auto sdIC = new BaseSensitiveDetector("SDIC", ntupleName, ID);
-      G4SDManager::GetSDMpointer()->AddNewDetector(sdIC );
-      // Retrieve the logical volume for this layer and set its SD
-      fLogicVacStep1->SetSensitiveDetector(sdIC );
+      if (it != mapping.end()) {
+          int ID = it->second;
+          G4cout << "--------0000000000000----------- ::: THE TUPLE ID IS:" << ID << G4endl;
+          auto sdIC = new BaseSensitiveDetector(ntupleName, ntupleName, ID, fAnaConfigManager);
+          G4SDManager::GetSDMpointer()->AddNewDetector(sdIC );
+          // Retrieve the logical volume for this layer and set its SD
+          fLogicVacStep1->SetSensitiveDetector(sdIC );
+      } else {
+          G4cout << "Ntuple name not found in map: " << ntupleName << G4endl;
+          // Handle error condition
+      }
+
+      
     
     }
     
     
     // Repeat for other layers within this subdetector
-    if (runAction!=nullptr && fConfig.GetConfigValueAsInt("Solenoid","behindCoreDet")){
+    if (fConfig.GetConfigValueAsInt("Solenoid","behindCore")){
       std::string ntupleName = "behindCore";
-      auto& mapping = runAction->GetNtupleNameToIdMap();
+      auto& mapping = fAnaConfigManager.GetNtupleNameToIdMap();
       auto it = mapping.find(ntupleName);
-      int ID = it->second;
-      auto sdBC = new BaseSensitiveDetector("SDBC", ntupleName, ID);
-      G4SDManager::GetSDMpointer()->AddNewDetector(sdBC);
-      fLogicVacStep1->SetSensitiveDetector(sdBC);
+      if (it != mapping.end()) {
+          int ID = it->second;
+          G4cout << "--------0000000000000----------- ::: THE TUPLE ID IS:" << ID << G4endl;
+          auto sdIC = new BaseSensitiveDetector(ntupleName, ntupleName, ID, fAnaConfigManager);
+          G4SDManager::GetSDMpointer()->AddNewDetector(sdIC );
+          // Retrieve the logical volume for this layer and set its SD
+          fLogicVacStep2->SetSensitiveDetector(sdIC );
+      } else {
+          G4cout << "Ntuple name not found in map: " << ntupleName << G4endl;
+          // Handle error condition
+      }
     }
 }
 

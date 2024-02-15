@@ -1,14 +1,19 @@
 // EventAction.cc
 #include "EventAction.hh"
 #include "BaseSensitiveDetector.hh" // Include your sensitive detector header
+#include "AnaConfigManager.hh"
 #include "G4Event.hh"
 #include "G4RunManager.hh"
 #include "G4SDManager.hh"
-#include "G4AnalysisManager.hh"
+#include <vector>
 
-EventAction::EventAction() : G4UserEventAction(), fConfig("config.ini") {
-    fOutputMode = fConfig.GetOutputMode();
-    std::vector<TreeInfo> fTreesInfo = fConfig.GetTreesInfo();
+EventAction::EventAction(AnaConfigManager& anaConfigManager)
+    : G4UserEventAction(),
+      fAnaConfigManager(anaConfigManager),
+      fOutputMode(anaConfigManager.GetOutputMode()), // Initialize from AnaConfigManager
+      fTreesInfo(anaConfigManager.GetTreesInfo()) { // Initialize from AnaConfigManager
+
+    // constructor body
 }
 
 EventAction::~EventAction() {
@@ -20,6 +25,7 @@ void EventAction::BeginOfEventAction(const G4Event*) {
     if(fOutputMode == "summary"){
         for (const auto& treeInfo : fTreesInfo) {
             BaseSensitiveDetector* mySD = static_cast<BaseSensitiveDetector*>(sdManager->FindSensitiveDetector(treeInfo.name));
+            G4cout << "Reset: " << treeInfo.name<< G4endl;
             if (mySD) {
                 mySD->Reset(); // Reset accumulated data for each sensitive detector
             }
@@ -27,48 +33,26 @@ void EventAction::BeginOfEventAction(const G4Event*) {
     }
 }
 
-void EventAction::EndOfEventAction(const G4Event*)
-{
-    if (fOutputMode == "summary"){
-        //------------------------------------------------------------
-        // Retrieve data from your sensitive detector here
-        //------------------------------------------------------------
-
+void EventAction::EndOfEventAction(const G4Event*) {
+    if (fOutputMode == "summary") {
         G4SDManager* sdManager = G4SDManager::GetSDMpointer();
-        G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
-        // loop over all the sensitive detector layers in use 
         for (const auto& treeInfo : fTreesInfo) {
-            
-            // get the sensitive detector 
             BaseSensitiveDetector* mySD = static_cast<BaseSensitiveDetector*>(sdManager->FindSensitiveDetector(treeInfo.name));
             if (!mySD) continue;
 
-            // Now use the getter methods to access the data
             G4double energySum = mySD->GetEnergySum();
-            G4double Ntot = mySD->GetTotalCount();
+            G4int Ntot = mySD->GetTotalCount();
             G4double EgammaSum = mySD->GetGammaEnergySum();
-            G4double Ngamma = mySD->GetGammaCount();
+            G4int Ngamma = mySD->GetGammaCount();
             G4double EeSum = mySD->GetElectronEnergySum();
-            G4double Ne = mySD->GetElectronCount();
+            G4int Ne = mySD->GetElectronCount();
 
-            //------------------------------------------------------------
-            // Fill it into the trees ! 
-            //------------------------------------------------------------
+            // These vectors are automatically passed by const reference due to the function signature
+            std::vector<int> particleCounts = {Ntot, Ngamma, Ne};
+            std::vector<G4double> energySums = {energySum, EgammaSum, EeSum};
 
-            G4int tupleID = mySD->GetTupleID();
-
-            analysisManager->FillNtupleDColumn(tupleID, 0, energySum);
-            analysisManager->FillNtupleIColumn(tupleID, 1, Ntot);
-            analysisManager->FillNtupleDColumn(tupleID, 2, EgammaSum);
-            analysisManager->FillNtupleIColumn(tupleID, 3, Ngamma);
-            analysisManager->FillNtupleDColumn(tupleID, 4, EeSum);
-            analysisManager->FillNtupleIColumn(tupleID, 5, Ne);
-            analysisManager->FinishNtuple();
-
-        }// end of for loop over all SDs 
-    } // end if summary mode 
-    
-
-    // And fill it into the trees 
+            fAnaConfigManager.FillBaseNtuple_summary(mySD->GetTupleID(), particleCounts, energySums);
+        }
+    }
 }

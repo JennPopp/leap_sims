@@ -15,10 +15,10 @@ namespace leap
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-DetectorConstruction::DetectorConstruction(const ConfigReader& config) 
-  : G4VUserDetectorConstruction(),fConfig(config) {
+DetectorConstruction::DetectorConstruction(const ConfigReader& config, AnaConfigManager& anaConfigManager) 
+  : G4VUserDetectorConstruction(),fConfig(config), fAnaConfigManager(anaConfigManager) {
     // Create instances of subdetectors and pass the confic object
-    fSolenoid = new Solenoid(config);
+    fSolenoid = new Solenoid(config, anaConfigManager);
   }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -30,7 +30,7 @@ DetectorConstruction::~DetectorConstruction() {
 G4VPhysicalVolume* DetectorConstruction::Construct() {
 
   // world volume 
-  G4double worldSize = 500*mm;
+  G4double worldSize = 2000*mm;
   G4Box* solidWorld = new G4Box("solidWorld", worldSize, worldSize, worldSize);
   G4LogicalVolume* logicWorld = new G4LogicalVolume(solidWorld, Materials::GetInstance()->GetMaterial("G4_AIR"), "logicWorld");
   G4VPhysicalVolume* physWorld = new G4PVPlacement(0, G4ThreeVector(), logicWorld, "physWorld", 0, false, 0);

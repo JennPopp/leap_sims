@@ -30,10 +30,12 @@ public:
     double GetConfigValueAsDouble(const std::string& section, const std::string& key) const;
     G4ThreeVector GetConfigValueAsG4ThreeVector(const std::string& section, const std::string& key) const;
     int GetConfigValueAsInt(const std::string& section, const std::string& key) const;
-    std::string GetOutputMode()  const;
+    std::string ReadOutputMode()  const;
+    const std::map<std::string, std::map<std::string, std::string>>& GetConfigValues() const;
+
 
     //methods for reading tree and branch configurations 
-    std::vector<TreeInfo> GetTreesInfo() const;
+    std::vector<TreeInfo> ReadTreesInfo() const;
     std::vector<BranchInfo> GetBranchesInfo(const std::string& treeName) const;
 
 private:

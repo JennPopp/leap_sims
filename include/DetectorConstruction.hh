@@ -14,7 +14,7 @@ namespace leap
 class DetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-    DetectorConstruction(const ConfigReader& config);
+    DetectorConstruction(const ConfigReader& config, AnaConfigManager& anaConfigManager);
     ~DetectorConstruction() override;
 
     // methods from base class
@@ -24,9 +24,12 @@ class DetectorConstruction : public G4VUserDetectorConstruction
   private:
     // Configuration reader
     const ConfigReader& fConfig;
+    // manager of the analysis configuration manager 
+    const AnaConfigManager& fAnaConfigManager;
 
     // pointers to subdetectors 
     Solenoid* fSolenoid;
+    
 
 };
 

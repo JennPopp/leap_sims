@@ -24,8 +24,7 @@
 // ********************************************************************
 //
 //
-/// \file common/exampleCommon.cc
-/// \brief Main program of the Common example
+
 
 #include "DetectorConstruction.hh"
 #include "ConfigReader.hh"
@@ -33,6 +32,7 @@
 #include "RunAction.hh"
 #include "EventAction.hh"
 #include "MacroGenerator.hh"
+#include "AnaConfigManager.hh"
 #include "GpsPrimaryGeneratorAction.hh"
 
 #include "G4RunManager.hh"
@@ -56,17 +56,21 @@ int main(int argc,char** argv)
       return 1;
   }
   
-  G4String fileName = "";
+  // generate the macro based on the output file
+  G4String macroFileName = "";
   if (argc > 1) {
-      fileName = argv[1];
-      MacroGenerator::generateMacro(config, fileName);
+      macroFileName = argv[1];
+      MacroGenerator::generateMacro(config, macroFileName );
   }
+
+  // Construct the the analysis configuration manager 
+  AnaConfigManager ana(config);
 
   // Construct the default run manager
   G4RunManager* runManager = new G4RunManager;
 
   // Set mandatory initialization classes
-  DetectorConstruction* detector = new DetectorConstruction(config);
+  DetectorConstruction* detector = new DetectorConstruction(config, ana);
   runManager->SetUserInitialization(detector);
 
   PhysicsList* physList = new PhysicsList(config);
@@ -74,8 +78,9 @@ int main(int argc,char** argv)
 
   // Set mandatory user action class
   runManager->SetUserAction(new GpsPrimaryGeneratorAction());
-  runManager->SetUserAction(new RunAction());
-  runManager->SetUserAction(new EventAction());
+  RunAction* run ;
+  runManager->SetUserAction(run = new RunAction(ana));
+  runManager->SetUserAction(new EventAction(ana));
 
   // Initialize the run manager 
   runManager->Initialize();
@@ -96,7 +101,7 @@ int main(int argc,char** argv)
   if ( ! ui ) {
     // batch mode
     G4String command = "/control/execute ";
-    UImanager->ApplyCommand(command+fileName);
+    UImanager->ApplyCommand(command+macroFileName);
   }
   else {
     // interactive mode

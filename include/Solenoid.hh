@@ -4,12 +4,13 @@
 
 #include "G4VUserDetectorConstruction.hh"
 #include "ConfigReader.hh"
+#include "AnaConfigManager.hh"
 
 class Solenoid : public G4VUserDetectorConstruction {
 public:
 
     // constructor 
-    Solenoid(const ConfigReader& config);
+    Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManager);
     // destructor
     ~Solenoid();
     // Other public methods and member variables 
@@ -18,6 +19,7 @@ public:
 
 private:
     const ConfigReader& fConfig;
+    AnaConfigManager& fAnaConfigManager;
     G4double fCoreRad;
     G4double fCoreLength;
     G4double fConvThick; 

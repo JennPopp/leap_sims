@@ -6,11 +6,28 @@
 /control/saveHistory
 /run/verbose 2
 #
-# Change the default number of threads (in multi-threaded mode)
-#/run/numberOfThreads 4
-#
 # Initialize kernel
 /run/initialize
+#-----------particle-gunlike-------------------------------
+/gps/energy 30 MeV
+/gps/number 10
+/gps/particle e-
+/gps/pos/centre 0.0 0.0 -0.5 m
+
+#---------gps-commands-------------------------------------
+#simply comment if not needed
+#2D-Beam
+/gps/ene/type Gauss
+/gps/ene/sigma 0.0
+/gps/pos/type Beam
+/gps/pos/sigma_x 0.0  mm
+/gps/pos/sigma_y 0.0  mm
+/gps/ang/type beam2d
+/gps/ang/sigma_x 0.0 rad
+/gps/ang/sigma_y 0.0 rad
+/gps/ang/rot1 0 1 0
+/gps/ang/rot2 1 0 0
+
 #
 # Visualization setting
 /control/execute vis.mac

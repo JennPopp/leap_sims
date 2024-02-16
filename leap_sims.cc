@@ -24,12 +24,15 @@
 // ********************************************************************
 //
 //
-/// \file common/exampleCommon.cc
-/// \brief Main program of the Common example
+
 
 #include "DetectorConstruction.hh"
 #include "ConfigReader.hh"
 #include "PhysicsList.hh"
+#include "RunAction.hh"
+#include "EventAction.hh"
+#include "MacroGenerator.hh"
+#include "AnaConfigManager.hh"
 #include "GpsPrimaryGeneratorAction.hh"
 
 #include "G4RunManager.hh"
@@ -52,26 +55,43 @@ int main(int argc,char** argv)
       std::cerr << "Failed to read configuration file." << std::endl;
       return 1;
   }
+  
+  // generate the macro based on the output file
+  G4String macroFileName = "";
+  if (argc > 1) {
+      macroFileName = argv[1];
+      MacroGenerator::generateMacro(config, macroFileName );
+  }
+
+  // Construct the the analysis configuration manager 
+  AnaConfigManager ana(config);
 
   // Construct the default run manager
   G4RunManager* runManager = new G4RunManager;
 
   // Set mandatory initialization classes
-  DetectorConstruction* detector = new DetectorConstruction(config);
+  DetectorConstruction* detector = new DetectorConstruction(config, ana);
   runManager->SetUserInitialization(detector);
 
   PhysicsList* physList = new PhysicsList(config);
   runManager->SetUserInitialization(physList);
 
   // Set mandatory user action class
-  runManager->SetUserAction(new GpsPrimaryGeneratorAction);
+  runManager->SetUserAction(new GpsPrimaryGeneratorAction());
+  RunAction* run ;
+  runManager->SetUserAction(run = new RunAction(ana));
+  runManager->SetUserAction(new EventAction(ana));
 
-  // Initialize visualization
+  // Initialize the run manager 
+  runManager->Initialize();
+
+// Initialize visualization
   //
-  G4VisManager* visManager = new G4VisExecutive;
+  //G4VisManager* visManager = new G4VisExecutive;
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-  // G4VisManager* visManager = new G4VisExecutive("Quiet");
+  G4VisManager* visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
+
 
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
@@ -81,8 +101,7 @@ int main(int argc,char** argv)
   if ( ! ui ) {
     // batch mode
     G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager->ApplyCommand(command+fileName);
+    UImanager->ApplyCommand(command+macroFileName);
   }
   else {
     // interactive mode

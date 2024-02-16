@@ -32,6 +32,7 @@
 #define GpsPrimaryGeneratorAction_h 1
 
 #include "G4VUserPrimaryGeneratorAction.hh"
+#include "ConfigReader.hh"
 #include "globals.hh"
 
 class G4GeneralParticleSource;
@@ -56,6 +57,7 @@ class GpsPrimaryGeneratorAction: public G4VUserPrimaryGeneratorAction
   private:
     // data members
     G4GeneralParticleSource*  fGeneralParticleSource = nullptr;
+
 };
 
 }

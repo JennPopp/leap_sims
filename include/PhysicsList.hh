@@ -71,8 +71,8 @@ private:
   G4VPhysicsConstructor*  fOptPhysicsList;
 
   // configurations 
-  G4String fPolStatus;
-  G4String fOptStatus; 
+  G4int  fPolStatus;
+  G4int fOptStatus; 
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

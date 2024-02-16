@@ -9,23 +9,27 @@
 namespace leap
 {
 
-/// Simple detector construction with a box volume placed in a world
+
 
 class DetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-    DetectorConstruction(const ConfigReader& config);
+    DetectorConstruction(const ConfigReader& config, AnaConfigManager& anaConfigManager);
     ~DetectorConstruction() override;
 
     // methods from base class
     G4VPhysicalVolume* Construct() override;
+    virtual void ConstructSDandField() override;
 
   private:
     // Configuration reader
     const ConfigReader& fConfig;
+    // manager of the analysis configuration manager 
+    const AnaConfigManager& fAnaConfigManager;
 
     // pointers to subdetectors 
     Solenoid* fSolenoid;
+    
 
 };
 

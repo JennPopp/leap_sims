@@ -3,6 +3,8 @@
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include <exception>
+#include "G4ThreeVector.hh"
 
 ConfigReader::ConfigReader(const std::string& configFile)
     : fConfigFile(configFile) {}
@@ -68,4 +70,115 @@ double ConfigReader::GetConfigValueAsDouble(const std::string& section, const st
         std::cerr << "Out of range: " << e.what() << std::endl;
     }
     return 0.0; // Default value or throw an exception
+}
+G4ThreeVector ConfigReader::GetConfigValueAsG4ThreeVector(const std::string& section, const std::string& key) const {
+    std::string valueStr = GetConfigValue(section, key);
+    std::istringstream iss(valueStr);
+
+    double x, y, z;
+    iss >> x >> y >> z;
+
+    if (iss.fail()) {
+        std::cerr << "Failed to parse G4ThreeVector for " << section << ":" << key << std::endl;
+        return G4ThreeVector(); // Return a default vector or handle the error appropriately
+    }
+
+    return G4ThreeVector(x, y, z);
+}
+
+int ConfigReader::GetConfigValueAsInt(const std::string& section, const std::string& key) const {
+    std::string valueStr = GetConfigValue(section, key);
+    std::istringstream iss(valueStr);
+    int value;
+    if (!(iss >> value)) {
+        std::cerr << "Error: Failed to convert [" << section << "] " << key << " to int: " << valueStr << std::endl;
+        return 0; // Return a default value or handle the error as needed
+    }
+    return value;
+}
+
+std::string ConfigReader::ReadOutputMode() const {
+        
+        try {
+            std::string     mode = GetConfigValue("Output", "mode");
+            if (!mode.empty()) {
+                return mode;
+            }
+        } catch (const std::exception& e) {
+            // Handle the exception if needed, e.g., logging the error message
+        }
+        return "summary"; // default value
+    }
+
+std::vector<TreeInfo> ConfigReader::ReadTreesInfo() const {
+    // Logic to read tree configurations from fConfigValues
+
+    // declare the tree vector 
+    std::vector<TreeInfo> trees;
+
+    // check all the geometry and detector states 
+    // for now just Solenoid 
+
+    G4cout << "GetTreesInfo() is called" << G4endl;
+    G4int solenoidStatus = GetConfigValueAsInt("Solenoid","solenoidStatus");
+    if (solenoidStatus){
+        G4int ICdet = GetConfigValueAsInt("Solenoid","inFrontCore");
+        G4cout << "The detector in front of the core of the Solenoid has status "<< ICdet << G4endl;
+        if (ICdet){
+            trees.push_back(TreeInfo("inFrontCore", "inFrontCore", 0));
+        }
+        G4int bCDet = GetConfigValueAsInt("Solenoid","behindCore");
+        G4cout << "The detector behind the core of the Solenoid has status "<< bCDet << G4endl;
+        if (bCDet){
+            trees.push_back(TreeInfo("behindCore","behindCore",bCDet));
+        }
+    }
+    G4cout << "trees size: " << trees.size() << G4endl;
+    return trees;
+}
+
+std::vector<BranchInfo> ConfigReader::GetBranchesInfo(const std::string& treeName) const {
+    std::vector<BranchInfo> branches;
+    
+    std::string mode = ReadOutputMode();
+
+    //later I will use the name to check whether It gets
+    // the standart currently below or calo info  
+
+    if (mode == "detailed"){
+        branches = {
+            {"pdg", "I"},
+            {"E", "D"},
+            {"x", "D"},
+            {"y", "D"},
+            {"z", "D"},
+            {"startx", "D"},
+            {"starty", "D"},
+            {"startz", "D"},
+            {"px", "D"},
+            {"py", "D"},
+            {"pz", "D"},
+            {"Polx", "D"},
+            {"Poly", "D"},
+            {"Polz", "D"},
+            {"TrackID", "D"},
+            {"ParentID", "D"},
+            {"EventID", "D"}
+        };
+    }else{ // use summary mode
+        branches = {
+            {"Esum", "D"},
+            {"NP", "I"},
+            {"EGammaSum", "D"},
+            {"NGamma", "I"},
+            {"EeSum", "D"},
+            {"Ne", "I"}
+        };
+    }
+
+    return branches;
+}
+
+const std::map<std::string, std::map<std::string, std::string>>& ConfigReader::GetConfigValues() const {
+    return fConfigValues;
 }

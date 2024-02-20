@@ -27,7 +27,7 @@ void AnaConfigManager::SetUp( const G4Run* aRun,
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     analysisManager->SetDefaultFileType("root");
     analysisManager->SetActivation(true);
-    analysisManager->SetVerboseLevel(4);
+    analysisManager->SetVerboseLevel(1);
 
     std :: ostringstream oss;
     oss << "run"<< aRun->GetRunID()<< "_"<< outFileName ;

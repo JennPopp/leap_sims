@@ -39,29 +39,57 @@
 #include "G4UImanager.hh"
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
+namespace leap {
+  void PrintUsage() {
+    G4cerr << " Usage: " << G4endl;
+    G4cerr << " leap_sims [-c configFileName of type string] [-v visualState of type bool]"  << G4endl;
+  }
+}
 
 using namespace leap;
 
 int main(int argc,char** argv)
 {
-  // Detect interactive mode (if no arguments) and define UI session
-  //
-  G4UIExecutive* ui = nullptr;
-  if ( argc == 1 ) { ui = new G4UIExecutive(argc, argv); }
+  // Get config name and visualization based on input or set default values 
+  G4String configFileName;
+  bool visualState = false; // Use bool for visualState
+  for (G4int i = 1; i < argc; i = i + 2) {
+    if (G4String(argv[i]) == "-c") {
+      configFileName = argv[i + 1];
+    } else if (G4String(argv[i]) == "-v") {
+      // Check next argument to determine true or false explicitly
+      G4String argValue = argv[i + 1];
+      if (argValue == "true" || argValue == "1") {
+        visualState = true;
+      } else if (argValue == "false" || argValue == "0") {
+        visualState = false;
+      } else {
+        PrintUsage(); // Invalid value for -v
+        return 1;
+      } 
+    } else {
+      PrintUsage();
+      return 1;
+    }
+  }
+  if (configFileName.empty()) { configFileName = "config.ini"; }
 
   // Read the configuration file 
-  ConfigReader config("config.ini");
+  ConfigReader config(configFileName);
   if (!config.ReadConfig()) {
       std::cerr << "Failed to read configuration file." << std::endl;
       return 1;
   }
   
-  // generate the macro based on the output file
-  G4String macroFileName = "";
-  if (argc > 1) {
-      macroFileName = argv[1];
-      MacroGenerator::generateMacro(config, macroFileName );
-  }
+  // Detect interactive mode and define UI session
+  //
+  G4UIExecutive* ui = nullptr;
+  if ( visualState == 1 ) { ui = new G4UIExecutive(argc, argv); }
+
+  // generate the macro based on config parameters
+  G4String macroFileName;
+  macroFileName = config.GetConfigValue("Input","macroName");
+  MacroGenerator::generateMacro(config, macroFileName );
 
   // Construct the the analysis configuration manager 
   AnaConfigManager ana(config);

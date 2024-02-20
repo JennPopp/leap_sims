@@ -4,7 +4,6 @@
 #include "Materials.hh"
 #include "ConfigReader.hh"
 
-
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4Box.hh"
@@ -19,11 +18,20 @@ DetectorConstruction::DetectorConstruction(const ConfigReader& config, AnaConfig
   : G4VUserDetectorConstruction(),fConfig(config), fAnaConfigManager(anaConfigManager) {
     // Create instances of subdetectors and pass the confic object
     fSolenoid = new Solenoid(config, anaConfigManager);
+    fCalo = new Calorimeter(config, anaConfigManager);
+
+    //initialize other geometry member variables 
+    if (fConfig.GetConfigValueAsInt("Solenoid","solenoidStatus")){
+      fDist2Pol = config.GetConfigValueAsDouble("Calorimeter","dist2Pol")*mm;
+    } else {
+      fDist2Pol = 0*mm;
+    }
   }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 DetectorConstruction::~DetectorConstruction() {
-  delete fSolenoid; 
+  delete fSolenoid;
+  delete fCalo; 
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -56,5 +64,8 @@ void DetectorConstruction::ConstructSDandField(){
   if (fConfig.GetConfigValueAsInt("Solenoid","solenoidStatus")){
     fSolenoid->ConstructSolenoidSD();
   } 
+  if(fConfig.GetConfigValueAsInt("Solenoid","BField")){
+    fSolenoid->ConstructSolenoidBfield();
+  }
 }
 } // namespace leap

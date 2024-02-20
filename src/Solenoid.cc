@@ -17,6 +17,10 @@
 #include "G4PolarizationManager.hh"
 #include "G4SDManager.hh"
 
+#include "G4UniformMagField.hh"
+#include "G4FieldManager.hh"
+#include "G4TransportationManager.hh"
+
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
@@ -39,6 +43,8 @@ Solenoid::Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManage
     fType = config.GetConfigValue("Solenoid", "type");
     fWorldMaterial = config.GetConfigValue("World", "material");
     fPolDeg = config.GetConfigValueAsDouble("GPS","polDeg");
+
+    fBz = config.GetConfigValueAsDouble("Solenoid","Bz");
 }
 
 Solenoid::~Solenoid() {}
@@ -93,7 +99,7 @@ G4VPhysicalVolume* Solenoid::Construct() {
                                         0.0*deg,  // starting angle
                                         360.0*deg ); // total angle
 
-    G4LogicalVolume * logicSolenoid = new G4LogicalVolume(solidSolenoid, //its solid
+    G4LogicalVolume* logicSolenoid = new G4LogicalVolume(solidSolenoid, //its solid
                                                         worldMat, 	 //its material
                                                         "motherSolenoid" , //its name
                                                         0,0,0);
@@ -235,13 +241,13 @@ G4VPhysicalVolume* Solenoid::Construct() {
                                     0.0*deg, //starting angle 
                                     360.0*deg );// end angle 
 
-    G4LogicalVolume* logicCore = new G4LogicalVolume(solidCore, // solid
+    fLogicCore = new G4LogicalVolume(solidCore, // solid
                                                      iron, // material 
                                                     "logicCore"); // name of logical volume 
 
     new G4PVPlacement(0, // no rotation
                       G4ThreeVector(), // (0,0,0)
-                      logicCore, // its logical volume 
+                      fLogicCore, // its logical volume 
                       "physBox", // name of physical volume
                       logicSolenoid, // its mother volume 
                       false, // no boolean operation
@@ -250,7 +256,7 @@ G4VPhysicalVolume* Solenoid::Construct() {
     if (fPolStatus == 1){
         // register logical Volume in PolarizationManager with polarization
         G4PolarizationManager * polMgr = G4PolarizationManager::GetInstance();
-        polMgr->SetVolumePolarization(logicCore,G4ThreeVector(0.,0.,fPolDeg));
+        polMgr->SetVolumePolarization(fLogicCore,G4ThreeVector(0.,0.,fPolDeg));
     }
     else{
         G4cout << "YOU ARE NOT USING POLARIZATION !!!!!" << G4endl;
@@ -259,10 +265,10 @@ G4VPhysicalVolume* Solenoid::Construct() {
     IronCoreVis->SetVisibility(true);
     IronCoreVis->SetLineWidth(2);
     IronCoreVis->SetForceSolid(true);
-    logicCore->SetVisAttributes(IronCoreVis);
+    fLogicCore->SetVisAttributes(IronCoreVis);
 
     //---------------------------------------------------------------------
-    // vacuum steps aka ideal detector volumes 
+    // vacuum steps aka ideal/virtual detector volumes 
     //---------------------------------------------------------------------
     // As they have the same geometry, both can use the same solid
     G4Tubs* solidVacStep =new G4Tubs("solidVacStep",  //Name
@@ -322,9 +328,6 @@ void Solenoid::ConstructSolenoidSD() {
           G4cout << "Ntuple name not found in map: " << ntupleName << G4endl;
           // Handle error condition
       }
-
-      
-    
     }
     
     
@@ -347,3 +350,17 @@ void Solenoid::ConstructSolenoidSD() {
     }
 }
 
+void Solenoid::ConstructSolenoidBfield(){
+  // define the magnetic field (start with uniform:))
+  G4UniformMagField* solenoidMagneticField = new G4UniformMagField(G4ThreeVector(0., 0., fBz*tesla));
+
+  // Create a field manager and set the magnetic field
+  G4FieldManager* fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+  fieldMgr->SetDetectorField(solenoidMagneticField);
+  fieldMgr->CreateChordFinder(solenoidMagneticField);
+
+  // Set the field manager for the logical volume of the iron core
+  fLogicCore->SetFieldManager(fieldMgr, true);
+
+
+}

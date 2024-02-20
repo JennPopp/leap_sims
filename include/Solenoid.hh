@@ -1,6 +1,6 @@
 // Solenoid.h
-#ifndef SubDetector_h
-#define SubDetector_h 1
+#ifndef Solenoid_h
+#define Solenoid_h 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "ConfigReader.hh"
@@ -16,6 +16,7 @@ public:
     // Other public methods and member variables 
     G4VPhysicalVolume* Construct();
     void ConstructSolenoidSD();
+    void ConstructSolenoidBfield();
 
 private:
     const ConfigReader& fConfig;
@@ -30,6 +31,8 @@ private:
     G4String fWorldMaterial;
     G4LogicalVolume* fLogicVacStep1;
     G4LogicalVolume* fLogicVacStep2;
+    G4LogicalVolume* fLogicCore;
+    G4double fBz;
 };
 
 #endif

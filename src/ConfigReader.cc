@@ -124,13 +124,13 @@ std::vector<TreeInfo> ConfigReader::ReadTreesInfo() const {
     if (solenoidStatus){
         G4int ICdet = GetConfigValueAsInt("Solenoid","inFrontCore");
         G4cout << "The detector in front of the core of the Solenoid has status "<< ICdet << G4endl;
-        if (ICdet){
+        if (ICdet>0){
             trees.push_back(TreeInfo("inFrontCore", "inFrontCore", 0));
         }
         G4int bCDet = GetConfigValueAsInt("Solenoid","behindCore");
         G4cout << "The detector behind the core of the Solenoid has status "<< bCDet << G4endl;
         if (bCDet){
-            trees.push_back(TreeInfo("behindCore","behindCore",bCDet));
+            trees.push_back(TreeInfo("behindCore","behindCore",ICdet));
         }
     }
     G4cout << "trees size: " << trees.size() << G4endl;
@@ -181,4 +181,17 @@ std::vector<BranchInfo> ConfigReader::GetBranchesInfo(const std::string& treeNam
 
 const std::map<std::string, std::map<std::string, std::string>>& ConfigReader::GetConfigValues() const {
     return fConfigValues;
+}
+
+std::string ConfigReader::ReadOutputFileName() const {
+    try {
+            std::string OutputFileName = GetConfigValue("Output", "fileName");
+            if (!OutputFileName.empty()) {
+                return OutputFileName;
+            }
+        } catch (const std::exception& e) {
+            G4cout<< "No output file name was found in the config file, use default."<< G4endl;
+        }
+    return "result"; // default value
+    
 }

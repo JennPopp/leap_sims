@@ -9,6 +9,7 @@
 AnaConfigManager::AnaConfigManager(const ConfigReader& config)
   : fConfig(config),
     fOutputMode(config.ReadOutputMode()),
+    fOutputFileName(config.ReadOutputFileName()),
     fTreesInfo(config.ReadTreesInfo()) {
     
     G4cout << "\n----> The output mode is " << fOutputMode << "\n" << G4endl;

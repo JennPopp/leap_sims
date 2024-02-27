@@ -87,8 +87,9 @@ int main(int argc,char** argv)
   if ( visualState == 1 ) { ui = new G4UIExecutive(argc, argv); }
 
   // generate the macro based on config parameters
-  G4String macroFileName;
-  macroFileName = config.GetConfigValue("Input","macroName");
+  G4String identifier;
+  identifier = config.GetConfigValue("Output","fileName");
+  G4String macroFileName = "macro_" + identifier + ".mac";
   MacroGenerator::generateMacro(config, macroFileName );
 
   // Construct the the analysis configuration manager 

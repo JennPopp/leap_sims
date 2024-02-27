@@ -36,13 +36,13 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     macroFile <<"/gps/particle " << particle << std::endl;
 
     std::string position = config.GetConfigValue("GPS","position");
-    macroFile <<"/gps/pos/centre " << position << std::endl; 
+    macroFile <<"/gps/pos/centre " << position << " mm" << std::endl; 
 
     macroFile << "/gps/pos/type Beam" << std::endl;
 
     std::string spotSize = config.GetConfigValue("GPS","spotSize");
-    macroFile << "/gps/pos/sigma_x "<< spotSize << std::endl;
-    macroFile << "/gps/pos/sigma_y "<< spotSize << std::endl;
+    macroFile << "/gps/pos/sigma_x "<< spotSize << " mm" << std::endl;
+    macroFile << "/gps/pos/sigma_y "<< spotSize << " mm" << std::endl;
 
     macroFile << "/gps/ang/type beam2d"<< std::endl;
 
@@ -61,7 +61,7 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     if (eneType == "Gauss"){
         
         energy = config.GetConfigValue("GPS", "energy");
-        macroFile << "/gps/energy " << energy << std::endl;
+        macroFile << "/gps/energy " << energy << " MeV "<< std::endl;
 
         std::string sigmaE = config.GetConfigValue("GPS","sigmaE");
         macroFile << "/gps/ene/sigma " << sigmaE << std::endl; 

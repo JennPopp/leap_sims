@@ -28,6 +28,9 @@ class AnaConfigManager {
     const std::string& GetOutputMode() const {
         return fOutputMode;
     }
+    const std::string& GetOutputFileName() const {
+        return fOutputFileName;
+    }
     const std::vector<TreeInfo>& GetTreesInfo() const {
         return fTreesInfo;
     }
@@ -39,6 +42,7 @@ class AnaConfigManager {
     // using the convention of putting an f in front of member variables 
     const ConfigReader& fConfig;
     const std::string fOutputMode;
+    const std::string fOutputFileName;
     const std::vector<TreeInfo> fTreesInfo; // tree info is structure with name, title and id
     std::map<std::string, int> fNtupleNameToIdMap; // need this for defining sensitive volumes in the subdetector classes
 

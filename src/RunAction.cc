@@ -18,7 +18,6 @@ RunAction::RunAction(AnaConfigManager& anaConfigManager)
       fAnaConfigManager(anaConfigManager),
       fOutputMode(anaConfigManager.GetOutputMode()), // Initialize from AnaConfigManager
       fTreesInfo(anaConfigManager.GetTreesInfo()) { // Initialize from AnaConfigManager
-
     // constructor body
 }
 
@@ -29,12 +28,11 @@ RunAction::~RunAction() {
 void RunAction::BeginOfRunAction(const G4Run* run) {
     // Called at the start of each run
     //std::cout << red << "Call to BeginOfRunAction." << reset << std::endl;
-    
+    G4String outputFileName = fAnaConfigManager.GetOutputFileName();
     // Initialize the analysis manager and create ntuples here
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     analysisManager->Clear(); // Clear existing analysis objects
-
-    fAnaConfigManager.SetUp(run, "baseOutputName"); 
+    fAnaConfigManager.SetUp(run, outputFileName); 
 
     G4cout << "....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......" << G4endl;
     G4cout << "### Run " << run->GetRunID() << " start." << G4endl;

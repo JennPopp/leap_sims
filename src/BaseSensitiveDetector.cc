@@ -19,25 +19,27 @@ BaseSensitiveDetector::~BaseSensitiveDetector() {}
 
 G4bool BaseSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* history) {
     // Common data processing logic, using layerIdentifier for differentiation
-     
-    if (fOutputMode == "detailed") {
-        fAnaConfigManager.FillBaseNtuple_detailed(fTupleID, step);
-    } else { // outputmode == summary as default 
-        // Get the PDG-ID to check what type of particle it is 
-        int pID = step->GetTrack()->GetParticleDefinition()->GetPDGEncoding();
-        G4double ene = step->GetPostStepPoint()->GetTotalEnergy()/MeV;
-        // always add to total energy sum and total number of particles 
-        fEnergySum += ene;
-        fNtot += 1; 
-        //then add to respective particle sums 
-        if (pID == 22){
-            fEgammaSum += ene;
-            fNgamma += 1;
-        } else if (pID == 11){
-            fEeSum += ene;
-            fNe += 1;
-        };
-    }
+    if (step->GetPostStepPoint()->GetMomentumDirection().z() > 0){
+        if (fOutputMode == "detailed") {
+            fAnaConfigManager.FillBaseNtuple_detailed(fTupleID, step);
+        } else { // outputmode == summary as default 
+            // Get the PDG-ID to check what type of particle it is 
+            int pID = step->GetTrack()->GetParticleDefinition()->GetPDGEncoding();
+            G4double ene = step->GetPostStepPoint()->GetTotalEnergy()/MeV;
+            // always add to total energy sum and total number of particles 
+            fEnergySum += ene;
+            fNtot += 1; 
+            //then add to respective particle sums 
+            if (pID == 22){
+                fEgammaSum += ene;
+                fNgamma += 1;
+            } else if (pID == 11){
+                fEeSum += ene;
+                fNe += 1;
+            };
+        }
+    } 
+    
 
     return true;
 }

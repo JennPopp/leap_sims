@@ -6,7 +6,7 @@
 #include "ConfigReader.hh"
 #include "AnaConfigManager.hh"
 
-class Calorimeter : public G4VUserDetectorConstruction {
+class Calorimeter {
 public:
 
     // constructor 
@@ -14,8 +14,10 @@ public:
     // destructor
     ~Calorimeter();
     // Other public methods and member variables 
-    G4VPhysicalVolume* Construct();
+    G4LogicalVolume* ConstructCalo();
     void ConstructCalorimeterSD();
+
+    G4double GetVirtCaloLength() const { return fVirtCaloLength; }
 
 private:
     const ConfigReader& fConfig;
@@ -28,6 +30,7 @@ private:
     G4LogicalVolume* fLogicCrystal;
     G4LogicalVolume* fLogicFrontDet;
     G4LogicalVolume* fLogicBackDet;
+    G4double fVirtCaloLength;
 
 
 };

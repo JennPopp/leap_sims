@@ -33,7 +33,7 @@ public:
     std::string ReadOutputMode()  const;
     const std::map<std::string, std::map<std::string, std::string>>& GetConfigValues() const;
     std::string ReadOutputFileName() const;
-
+    int ReadShowerDevStat() const;
     //methods for reading tree and branch configurations 
     std::vector<TreeInfo> ReadTreesInfo() const;
     std::vector<BranchInfo> GetBranchesInfo(const std::string& treeName) const;

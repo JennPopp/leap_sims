@@ -3,7 +3,7 @@
 #include "Solenoid.hh"
 #include "Materials.hh"
 #include "ConfigReader.hh"
-
+#include "G4SDManager.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4Box.hh"
@@ -44,14 +44,29 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
   G4VPhysicalVolume* physWorld = new G4PVPlacement(0, G4ThreeVector(), logicWorld, "physWorld", 0, false, 0);
 
 
+  G4double magThick = 0;
   // Place the solenoid into the world 
   // create an instance of the solenoid class
   if (fConfig.GetConfigValueAsInt("Solenoid","solenoidStatus")){
-    G4VPhysicalVolume* solenoidVolume = fSolenoid->Construct();
+    G4LogicalVolume* logicSolenoid = fSolenoid->ConstructSolenoid();
+    magThick = fSolenoid->GetMagThick();
     new G4PVPlacement(0,
-                      G4ThreeVector(), 
-                      solenoidVolume->GetLogicalVolume(), 
-                      solenoidVolume->GetName(), 
+                      G4ThreeVector(0,0,magThick/2.0), 
+                      logicSolenoid, 
+                      "physicalSolenoid", 
+                      logicWorld, 
+                      false, 
+                      0); 
+  }
+  G4cout << ".....................................................................................................magThick is "<< magThick << G4endl;
+  if (fConfig.GetConfigValueAsInt("Calorimeter","calorimeterStatus")){
+    G4LogicalVolume* logicCalo = fCalo->ConstructCalo();
+    G4double caloLength = fCalo->GetVirtCaloLength();
+    G4cout << ".....................................................................................................caloLength is "<< caloLength << G4endl;
+    new G4PVPlacement(0,
+                      G4ThreeVector(0,0,magThick+fDist2Pol+caloLength/2.), 
+                      logicCalo, 
+                      "physicalCalo", 
                       logicWorld, 
                       false, 
                       0); 
@@ -67,5 +82,10 @@ void DetectorConstruction::ConstructSDandField(){
   if(fConfig.GetConfigValueAsInt("Solenoid","BField")){
     fSolenoid->ConstructSolenoidBfield();
   }
+  if(fConfig.GetConfigValueAsInt("Calorimeter","calorimeterStatus")){
+    fCalo->ConstructCalorimeterSD();
+  }
+  G4SDManager* sdManager = G4SDManager::GetSDMpointer();
+  sdManager->ListTree();
 }
 } // namespace leap

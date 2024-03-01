@@ -60,6 +60,7 @@ void Materials::DefineMaterials() {
     G4Material* lead = nistManager->FindOrBuildMaterial("G4_Pb");
     G4Material* copper = nistManager->FindOrBuildMaterial("G4_Cu");
     G4Material* tungsten = nistManager->FindOrBuildMaterial("G4_W");
+    G4Material* aluminium = nistManager->FindOrBuildMaterial("G4_Al");
     G4Material* steel = nistManager->FindOrBuildMaterial("G4_STAINLESS-STEEL");
     G4Material* lanex = nistManager->FindOrBuildMaterial("G4_GADOLINIUM_OXYSULFIDE");
     G4Material* PbO = nistManager->FindOrBuildMaterial("G4_LEAD_OXIDE");

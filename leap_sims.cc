@@ -98,14 +98,14 @@ int main(int argc,char** argv)
   // Construct the default run manager
   G4RunManager* runManager = new G4RunManager;
 
-  // Set mandatory initialization classes
+  // Set initialization classes
   DetectorConstruction* detector = new DetectorConstruction(config, ana);
   runManager->SetUserInitialization(detector);
 
   PhysicsList* physList = new PhysicsList(config);
   runManager->SetUserInitialization(physList);
 
-  // Set mandatory user action class
+  // Set user action class
   runManager->SetUserAction(new GpsPrimaryGeneratorAction());
   RunAction* run ;
   runManager->SetUserAction(run = new RunAction(ana));

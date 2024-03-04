@@ -6,7 +6,7 @@
 #include "ConfigReader.hh"
 #include "AnaConfigManager.hh"
 
-class Solenoid : public G4VUserDetectorConstruction {
+class Solenoid{
 public:
 
     // constructor 
@@ -14,9 +14,12 @@ public:
     // destructor
     ~Solenoid();
     // Other public methods and member variables 
-    G4VPhysicalVolume* Construct();
+    G4LogicalVolume* ConstructSolenoid();
     void ConstructSolenoidSD();
     void ConstructSolenoidBfield();
+
+     // Getter method for magThick
+    G4double GetMagThick() const { return fMagThick; }
 
 private:
     const ConfigReader& fConfig;
@@ -33,6 +36,7 @@ private:
     G4LogicalVolume* fLogicVacStep2;
     G4LogicalVolume* fLogicCore;
     G4double fBz;
+    G4double fMagThick;
 };
 
 #endif

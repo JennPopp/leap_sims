@@ -33,7 +33,7 @@ const std::string red = "\033[31m";
 const std::string reset = "\033[0m";
 
 Solenoid::Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManager)
-  : G4VUserDetectorConstruction(), fConfig(config), fAnaConfigManager(anaConfigManager) {
+  : fConfig(config), fAnaConfigManager(anaConfigManager) {
     // Read configuration values and initialize the subdetector
     fCoreRad = config.GetConfigValueAsDouble("Solenoid", "coreRad")*mm;
     fCoreLength = config.GetConfigValueAsDouble("Solenoid", "coreLength")*mm;
@@ -49,7 +49,7 @@ Solenoid::Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManage
 
 Solenoid::~Solenoid() {}
 
-G4VPhysicalVolume* Solenoid::Construct() {
+G4LogicalVolume* Solenoid::ConstructSolenoid() {
 
     //---------------------------------------------------------------
     //Geometry Parameters
@@ -61,19 +61,19 @@ G4VPhysicalVolume* Solenoid::Construct() {
     G4double coreGap = 12.5*mm;
     G4double vacThick = 1*mm; // TP2: dist core and cone TP1: dist core and conv
     
-    G4double rMax, rOpen, rOuterCoil, coneDist, magThick;
+    G4double rMax, rOpen, rOuterCoil, coneDist;
     if (fType == "TP2"){
       rMax = 162.0*mm;
       rOpen = 30.0*mm;
       rOuterCoil = 161*mm;
       coneDist = fCoreLength/2. + coreGap;
-      magThick = 2.*(coneLength+coreGap)+fCoreLength;
+      fMagThick = 2.*(coneLength+coreGap)+fCoreLength;
     } else if (fType == "TP1"){
       rMax = 196.0*mm;
       rOpen = 36.84308*mm;
       rOuterCoil = 170*mm;
       coneDist = fCoreLength/2. + coreGap + fConvThick;
-      magThick = 2.*(coneLength+coreGap+fConvThick)+fCoreLength;
+      fMagThick = 2.*(coneLength+coreGap+fConvThick)+fCoreLength;
     } else {
         G4String description = "You have chosen an invalid solenoid Type in the config.ini. The only valid types are TP1 and TP2!";
         G4Exception("Construct", "InvalidSolenoidType", FatalException, description);
@@ -95,7 +95,7 @@ G4VPhysicalVolume* Solenoid::Construct() {
     G4Tubs* solidSolenoid = new G4Tubs("solidSolenoid",
                                         0.0*mm, // inner radius
                                         rMax+1.0*mm,  // outer radius
-                                        magThick/2., // half length in z
+                                        fMagThick/2., // half length in z
                                         0.0*deg,  // starting angle
                                         360.0*deg ); // total angle
 
@@ -103,20 +103,12 @@ G4VPhysicalVolume* Solenoid::Construct() {
                                                         worldMat, 	 //its material
                                                         "motherSolenoid" , //its name
                                                         0,0,0);
-    
-    G4VPhysicalVolume* physSolenoid = new G4PVPlacement(0,	//rotation
-                      G4ThreeVector(0.0*mm, 0.0*mm, 0.0*mm),// translation position
-                      logicSolenoid,      //its logical volume
-                      "PhysicalSolenoid",   //its name  (2nd constructor)
-                      0,         //its mother volume
-                      false,              //no boolean operation
-                      0);                 //copy number
 
     logicSolenoid->SetVisAttributes(G4VisAttributes::GetInvisible());
     //---------------------------------------------------------------
     // housing of the solenoid
     //---------------------------------------------------------------
-    G4double DzArrayMagnet   [] = {-magThick/2., -coneDist, -fCoreLength/2., fCoreLength/2.,  coneDist, magThick/2.};
+    G4double DzArrayMagnet   [] = {-fMagThick/2., -coneDist, -fCoreLength/2., fCoreLength/2.,  coneDist, fMagThick/2.};
     G4double RminArrayMagnet [] = {rOpen,  fCoreRad,  fCoreRad, fCoreRad,  fCoreRad,  rOpen};
     G4double RmaxArrayMagnet [] = {rMax, rMax, rMax, rMax, rMax, rMax};
     
@@ -305,7 +297,7 @@ G4VPhysicalVolume* Solenoid::Construct() {
                       0);                        //copy number
 
 
-    return physSolenoid;
+    return logicSolenoid;
 }
 
 void Solenoid::ConstructSolenoidSD() {

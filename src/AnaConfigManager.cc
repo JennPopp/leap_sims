@@ -10,7 +10,8 @@ AnaConfigManager::AnaConfigManager(const ConfigReader& config)
   : fConfig(config),
     fOutputMode(config.ReadOutputMode()),
     fOutputFileName(config.ReadOutputFileName()),
-    fTreesInfo(config.ReadTreesInfo()) {
+    fTreesInfo(config.ReadTreesInfo()),
+    fShowerDevStat(config.ReadShowerDevStat()) {
     
     G4cout << "\n----> The output mode is " << fOutputMode << "\n" << G4endl;
    
@@ -71,32 +72,83 @@ void AnaConfigManager::Save() const {
 
 void AnaConfigManager::FillBaseNtuple_detailed(int tupleID, G4Step* step) const {
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-    analysisManager->FillNtupleIColumn(tupleID,0, step->GetTrack()->GetParticleDefinition()->GetPDGEncoding());
+    auto track = step->GetTrack();
+    auto PSP = step->GetPostStepPoint();
+    analysisManager->FillNtupleIColumn(tupleID,0, track->GetParticleDefinition()->GetPDGEncoding());
 
-    analysisManager->FillNtupleDColumn(tupleID,1, step->GetPostStepPoint()->GetTotalEnergy()/CLHEP::MeV);
+    analysisManager->FillNtupleDColumn(tupleID,1, PSP->GetTotalEnergy()/CLHEP::MeV);
 
-    analysisManager->FillNtupleDColumn(tupleID,2, step->GetPostStepPoint()->GetPosition().x());
-    analysisManager->FillNtupleDColumn(tupleID,3, step->GetPostStepPoint()->GetPosition().y());
-    analysisManager->FillNtupleDColumn(tupleID,4, step->GetPostStepPoint()->GetPosition().z());
+    analysisManager->FillNtupleDColumn(tupleID,2, PSP->GetPosition().x());
+    analysisManager->FillNtupleDColumn(tupleID,3, PSP->GetPosition().y());
+    analysisManager->FillNtupleDColumn(tupleID,4, PSP->GetPosition().z());
 
-    analysisManager->FillNtupleDColumn(tupleID,5, step->GetTrack()->GetVertexPosition().x());
-    analysisManager->FillNtupleDColumn(tupleID,6, step->GetTrack()->GetVertexPosition().y());
-    analysisManager->FillNtupleDColumn(tupleID,7, step->GetTrack()->GetVertexPosition().z());
+    analysisManager->FillNtupleDColumn(tupleID,5, track->GetVertexPosition().x());
+    analysisManager->FillNtupleDColumn(tupleID,6, track->GetVertexPosition().y());
+    analysisManager->FillNtupleDColumn(tupleID,7, track->GetVertexPosition().z());
 
-    analysisManager->FillNtupleDColumn(tupleID,8, step->GetPostStepPoint()->GetMomentumDirection().x());
-    analysisManager->FillNtupleDColumn(tupleID,9, step->GetPostStepPoint()->GetMomentumDirection().y());
-    analysisManager->FillNtupleDColumn(tupleID,10, step->GetPostStepPoint()->GetMomentumDirection().z());
+    analysisManager->FillNtupleDColumn(tupleID,8, PSP->GetMomentumDirection().x());
+    analysisManager->FillNtupleDColumn(tupleID,9, PSP->GetMomentumDirection().y());
+    analysisManager->FillNtupleDColumn(tupleID,10, PSP->GetMomentumDirection().z());
 
-    analysisManager->FillNtupleDColumn(tupleID,11, step->GetTrack()->GetPolarization().x());
-    analysisManager->FillNtupleDColumn(tupleID,12, step->GetTrack()->GetPolarization().y());
-    analysisManager->FillNtupleDColumn(tupleID,13, step->GetTrack()->GetPolarization().z());
+    analysisManager->FillNtupleDColumn(tupleID,11, track->GetPolarization().x());
+    analysisManager->FillNtupleDColumn(tupleID,12, track->GetPolarization().y());
+    analysisManager->FillNtupleDColumn(tupleID,13, track->GetPolarization().z());
 
-    analysisManager->FillNtupleDColumn(tupleID,14, step->GetTrack()->GetTrackID());
-    analysisManager->FillNtupleDColumn(tupleID,15, step->GetTrack()->GetParentID());
+    analysisManager->FillNtupleDColumn(tupleID,14, track->GetTrackID());
+    analysisManager->FillNtupleDColumn(tupleID,15, track->GetParentID());
     analysisManager->FillNtupleDColumn(tupleID,16, G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID());
 
     analysisManager->AddNtupleRow(tupleID);
 };
+
+void AnaConfigManager::FillCaloFrontTuple_detailed(int tupleID,const G4VTouchable* history, G4Step* step) const {
+    G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+    auto track = step->GetTrack();
+    auto PSP = step->GetPostStepPoint();
+    analysisManager->FillNtupleIColumn(tupleID,0, track->GetParticleDefinition()->GetPDGEncoding());
+
+    analysisManager->FillNtupleDColumn(tupleID,1, PSP->GetTotalEnergy()/CLHEP::MeV);
+
+    analysisManager->FillNtupleDColumn(tupleID,2, PSP->GetPosition().x());
+    analysisManager->FillNtupleDColumn(tupleID,3, PSP->GetPosition().y());
+    analysisManager->FillNtupleDColumn(tupleID,4, PSP->GetPosition().z());
+
+    analysisManager->FillNtupleDColumn(tupleID,5, track->GetVertexPosition().x());
+    analysisManager->FillNtupleDColumn(tupleID,6, track->GetVertexPosition().y());
+    analysisManager->FillNtupleDColumn(tupleID,7, track->GetVertexPosition().z());
+
+    analysisManager->FillNtupleDColumn(tupleID,8, PSP->GetMomentumDirection().x());
+    analysisManager->FillNtupleDColumn(tupleID,9, PSP->GetMomentumDirection().y());
+    analysisManager->FillNtupleDColumn(tupleID,10, PSP->GetMomentumDirection().z());
+
+    analysisManager->FillNtupleDColumn(tupleID,11, track->GetPolarization().x());
+    analysisManager->FillNtupleDColumn(tupleID,12, track->GetPolarization().y());
+    analysisManager->FillNtupleDColumn(tupleID,13, track->GetPolarization().z());
+
+    analysisManager->FillNtupleDColumn(tupleID,14, track->GetTrackID());
+    analysisManager->FillNtupleDColumn(tupleID,15, track->GetParentID());
+    analysisManager->FillNtupleDColumn(tupleID,16, G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID());
+
+    analysisManager->FillNtupleIColumn(tupleID,17, history->GetReplicaNumber(1));
+    analysisManager->AddNtupleRow(tupleID);
+};
+
+void AnaConfigManager::FillCaloCrystNtuple_detailed(int tupleID,const G4VTouchable* history, G4Step* step) const {
+    G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+    auto track = step->GetTrack();
+    auto PSP = step->GetPostStepPoint();
+    analysisManager->FillNtupleIColumn(tupleID,0, track->GetParticleDefinition()->GetPDGEncoding());
+    analysisManager->FillNtupleDColumn(tupleID,1, PSP->GetTotalEnergy()/CLHEP::MeV);
+    analysisManager->FillNtupleDColumn(tupleID,2,step->GetTotalEnergyDeposit()/CLHEP::MeV);
+    analysisManager->FillNtupleDColumn(tupleID,3, PSP->GetPosition().x());
+    analysisManager->FillNtupleDColumn(tupleID,4, PSP->GetPosition().y());
+    analysisManager->FillNtupleDColumn(tupleID,5, PSP->GetPosition().z());
+    analysisManager->FillNtupleIColumn(tupleID,6, track->GetTrackID());
+    analysisManager->FillNtupleIColumn(tupleID,7, track->GetParentID());
+    analysisManager->FillNtupleIColumn(tupleID,8, G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID());
+    analysisManager->FillNtupleIColumn(tupleID,9, history->GetReplicaNumber(3));
+    analysisManager->AddNtupleRow(tupleID);
+}
 
 void AnaConfigManager::FillBaseNtuple_summary(int tupleID,
                                                 const std::vector<int> particleCounts,
@@ -110,6 +162,30 @@ void AnaConfigManager::FillBaseNtuple_summary(int tupleID,
     analysisManager->FillNtupleIColumn(tupleID, 5, particleCounts[2]);
     analysisManager->AddNtupleRow(tupleID);
 };
+
+void AnaConfigManager::FillCaloFrontTuple_summary(int tupleID,
+                                                    const std::vector<int> NP,
+                                                    const std::vector<double> Esum) const {
+    G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+    for (int i = 0; i < 9; ++i) {
+        analysisManager->FillNtupleDColumn(tupleID, i, Esum[i]);
+        //G4cout << "Filling branch with value: " << Esum[i] << G4endl;
+    }
+    for (int i = 0; i < 9; ++i) {
+        analysisManager->FillNtupleDColumn(tupleID, 9+i, NP[i]);
+    }
+    analysisManager->AddNtupleRow(tupleID);
+};
+
+
+void AnaConfigManager::FillCaloCrystNtuple_summary(int tupleID,
+                                                    const std::vector<double> Edep) const {
+    G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+    for (int i = 0; i < 9; ++i) {
+        analysisManager->FillNtupleDColumn(tupleID, i, Edep[i]);
+    }
+    analysisManager->AddNtupleRow(tupleID);
+}
 
 void AnaConfigManager::SetupMetadataTTree() {
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();

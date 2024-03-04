@@ -4,6 +4,9 @@
 #include "Materials.hh"
 #include "ConfigReader.hh"
 // need to include sensitive detectors 
+#include "CaloFrontSensitiveDetector.hh"
+#include "CaloCrystalSD.hh"
+
 #include "AnaConfigManager.hh"
 
 
@@ -16,7 +19,7 @@
 
 #include "G4Exception.hh"
 
-//#include "G4SDManager.hh"
+#include "G4SDManager.hh"
 
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
@@ -24,7 +27,7 @@
 
 // The constructor: 
 Calorimeter::Calorimeter(const ConfigReader& config, AnaConfigManager& anaConfigManager)
-  : G4VUserDetectorConstruction(), fConfig(config), fAnaConfigManager(anaConfigManager) {
+  : fConfig(config), fAnaConfigManager(anaConfigManager) {
     // Read configuration values and initialize the subdetector
     fType = config.GetConfigValue("Calorimeter", "type");
     if (fType != "full"){
@@ -40,7 +43,7 @@ Calorimeter::Calorimeter(const ConfigReader& config, AnaConfigManager& anaConfig
 Calorimeter::~Calorimeter(){}
 
 // Function to construct the calo mother volume 
-G4VPhysicalVolume* Calorimeter::Construct() {
+G4LogicalVolume* Calorimeter::ConstructCalo() {
     //---------------------------------------------------------------
     //Geometry Parameters
     //---------------------------------------------------------------
@@ -56,13 +59,12 @@ G4VPhysicalVolume* Calorimeter::Construct() {
     G4double alairgapxy = crystXY + 2*alairgapthick;
     G4double alairgaplength = crystThick + alairgapthick;
     G4double aluwrapxy = alairgapxy + 2*aluwrapthick;
-    G4double aluwraplength = alairgaplength + aluwrapthick + detThick;
+    G4double aluwraplength = alairgaplength + aluwrapthick;
 
     //defining the size of the Calorimetercell and the virtual calorimeter (mother volume of the calorimetercells)
     //G4int NbofCalor = 9; //here later free parameter to select number of crystals
     G4double calorcellxy = aluwrapxy;
-    G4double calorcelllength = aluwraplength + detThick;
-    G4double virtcalorlength;
+    G4double calorcelllength = aluwraplength + 2*detThick;
 
     G4double virtcalorxy;
     G4double frontPlateZ, frontPlateY,frontPlateX, tbPlateZ;
@@ -72,11 +74,11 @@ G4VPhysicalVolume* Calorimeter::Construct() {
       frontPlateX=160*mm;
       frontPlateY=130*mm;
       tbPlateZ=693*mm;
-      virtcalorlength=tbPlateZ;
+      fVirtCaloLength=tbPlateZ;
       virtcalorxy = frontPlateX;
     }
     else{
-      virtcalorlength = calorcelllength;
+      fVirtCaloLength = calorcelllength;
       if (fNcrystals == 1){
         virtcalorxy = calorcellxy;
       }
@@ -94,7 +96,7 @@ G4VPhysicalVolume* Calorimeter::Construct() {
   // materials
   //---------------------------------------------------------------
   G4Material* Air       = Materials::GetInstance()->GetMaterial("Air");
-  G4Material* Al        = Materials::GetInstance()->GetMaterial("Aluminium");
+  G4Material* Al        = Materials::GetInstance()->GetMaterial("G4_Al");
   G4Material* Vacuum    = Materials::GetInstance()->GetMaterial("Galactic");
   G4Material* PEEK = Materials::GetInstance()->GetMaterial("PEEK");
   G4Material* worldMat = Materials::GetInstance()->GetMaterial(fWorldMaterial);
@@ -107,19 +109,11 @@ G4VPhysicalVolume* Calorimeter::Construct() {
   G4Box* solidCaloMother = new G4Box("solidCaloMother",  //Name
                                 virtcalorxy/2.,   // x size
                                 virtcalorxy/2.,     // y size
-                                virtcalorlength/2.); // z size
+                                fVirtCaloLength/2.); // z size
 
   G4LogicalVolume* logicCaloMother = new G4LogicalVolume(solidCaloMother,    //its solid
                                           worldMat,    //its material
                                           "logicCaloMother");       //its name
-
-  G4VPhysicalVolume* physCaloMother = new G4PVPlacement(0,	//rotation
-                    G4ThreeVector(0.0*mm, 0.0*mm, 0.0*mm),// translation position
-                    logicCaloMother,      //its logical volume
-                    "PhysicalSolenoid",   //its name  (2nd constructor)
-                    0,         //its mother volume
-                    false,              //no boolean operation
-                    0);                 //copy number
 
   //make virtual mother volume invisible
   logicCaloMother->SetVisAttributes(G4VisAttributes::GetInvisible());
@@ -142,7 +136,7 @@ G4VPhysicalVolume* Calorimeter::Construct() {
 
   G4double calocellZpos;
   
-  if(fType=="full"){calocellZpos=-tbPlateZ/2+frontPlateZ/2+9*mm+calorcelllength/2;}
+  if(fType=="full"){calocellZpos=-tbPlateZ/2+frontPlateZ+9*mm+calorcelllength/2+1*mm;;}
   else{calocellZpos=0;}
 
   if(fNcrystals==9){
@@ -157,11 +151,12 @@ G4VPhysicalVolume* Calorimeter::Construct() {
                         "physCaloCell",    //its name
                         logicCaloMother,               //its mother
                         false,                     //no boolean operat
-                        i);                        //copy number       //copy number
+                        i,                              //copy number       //copy number
+                        true);                     // check overlap    
       }
   } else if (fNcrystals == 1){
     new G4PVPlacement(0,		       //no rotation
-                      G4ThreeVector(0,0,0),  //its position
+                      G4ThreeVector(0,0,calocellZpos),  //its position
                       logicCaloCell,            //its logical volume
                       "physCaloCell",    //its name
                       logicCaloMother,               //its mother
@@ -213,7 +208,7 @@ G4VPhysicalVolume* Calorimeter::Construct() {
                                         "logicAirGap");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,-(detThick-aluwrapthick)/2),    //its position // old 0.,0.,aluwrapthick/2
+                    G4ThreeVector(0.,0.,-(aluwrapthick)/2),    //its position // old 0.,0.,aluwrapthick/2
                     logicAirGap,            //its logical volume
                     "AlAirGap",                 //its name
                     logicAluWrap,               //its mother
@@ -260,12 +255,13 @@ G4VPhysicalVolume* Calorimeter::Construct() {
                                         "logicCaloFrontDet");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,-aluwraplength/2),    //its position 
+                    G4ThreeVector(0.,0.,-(aluwraplength/2+detThick/2.)),    //its position 
                     fLogicFrontDet,            //its logical volume
                     "physCaloFrontDet",                 //its name
                     logicCaloCell,               //its mother //old fCaloCellLV
                     false,                     //no boolean operat
-                    0);                        //copy number
+                    0,                         //copy number
+                    true);                     // check for overlaps    
 
   fLogicBackDet = new G4LogicalVolume(solidVacStep,    //its solid
                                           Vacuum,    //its material
@@ -279,6 +275,138 @@ G4VPhysicalVolume* Calorimeter::Construct() {
                         false,                     //no boolean operat
                         0);                        //copy number
 
-return physCaloMother;
+  //---------------------------------------------------------------
+  // If the full calorimeter is simulated -> also build housing    
+  //---------------------------------------------------------------
+  if(fType=="full"){
+    //
+    // Plastic front plate with holes in it --------------------------
+    //
+
+    auto FrontPlateBox = new G4Box("FrontPlateBox",  //Name
+                                  frontPlateX/2.,
+                                  frontPlateY/2,
+                                  frontPlateZ/2.);
+
+    auto FrontPlateLV = new G4LogicalVolume(FrontPlateBox,    //its solid
+                                        PEEK,    //its material
+                                        "FrontPlateLV");       //its name
+
+    G4double FrontPlateZPos = -tbPlateZ/2+frontPlateZ/2+9*mm;
+
+    new G4PVPlacement(0,                   //no rotation
+                      G4ThreeVector(0.,0.,FrontPlateZPos),    //its position //old 0.,0.,aluwraplength/2
+                              FrontPlateLV,            //its logical volume
+                              "FrontPlate",                 //its name
+                              logicCaloMother,               //its mother
+                              false,                     //no boolean operat
+                              0);                        //copy number
+
+    G4VisAttributes* FrontPlateVis = new G4VisAttributes(G4Colour(0,128/255,1));
+    FrontPlateVis->SetForceSolid(true);
+    FrontPlateLV->SetVisAttributes(FrontPlateVis);
+
+    auto FrontPlaneHoleTub = new G4Tubs("FrontPlaneHoleTub",
+                                      0.0*mm, // inner radius
+                                      18.5*mm ,  // outer radius
+                                      frontPlateZ/2., // half length in z
+                                      0.0*deg,  // starting angle
+                                      360.0*deg ); // total angle
+
+    auto FrontPlaneHoleLV = new G4LogicalVolume(FrontPlaneHoleTub,    //its solid
+                                        worldMat,    //its material
+                                        "FrontPlateHoleLV");       //its name
+
+    G4double FrontHolDist = 39.0*mm ;
+    G4double FrontHolPosX[9]={-FrontHolDist, 0, FrontHolDist,-FrontHolDist, 0, FrontHolDist, -FrontHolDist, 0, FrontHolDist};
+    G4double FrontHolPosY[9]={FrontHolDist,FrontHolDist,FrontHolDist, 0,0,0,-FrontHolDist,-FrontHolDist,-FrontHolDist};
+
+    for (G4int i=0;i<=8;i++){
+      new G4PVPlacement(0,		       //no rotation
+                G4ThreeVector(FrontHolPosX[i],FrontHolPosY[i],0),  //its position
+                FrontPlaneHoleLV,            //its logical volume
+                "FrontPlaneHole",    //its name
+                FrontPlateLV,               //its mother
+                false,                     //no boolean operat
+                i);                        //copy number       //copy number
+    }
+
+    //
+    // Top and botto aluminium plates -----------------------------------------------------------
+    //
+    G4double tbPlateY= 20*mm;
+    auto TBPlateBox = new G4Box("TBPlateBox",  //Name
+                                frontPlateX/2.,
+                                tbPlateY/2,
+                                tbPlateZ/2.);
+
+    auto FrontPlateCut = new G4Box("TBPlateBox",  //Name
+                                frontPlateX+2/2.,
+                                3*mm,
+                                frontPlateZ/2.);
+
+    G4ThreeVector FPCutTrans(0, -tbPlateY/2+2*mm, FrontPlateZPos);
+
+    G4SubtractionSolid* TBPlateSolid = new G4SubtractionSolid("TBPlateSolid", // Name
+                                                                TBPlateBox, // 1. Volume
+                                                                FrontPlateCut, // 2. Volume
+                                                                0, // rotation
+                                                                FPCutTrans // translation
+                                                                );
+
+    auto TBPlateLV = new G4LogicalVolume(TBPlateSolid,    //its solid
+                                        Al,    //its material
+                                        "TBPlateLV");       //its name
+
+    new G4PVPlacement(0,                   //no rotation
+                      G4ThreeVector(0.,frontPlateX/2-tbPlateY/2.,0.),    //its position //
+                              TBPlateLV,            //its logical volume
+                              "TopPlate",                 //its name
+                              logicCaloMother,               //its mother
+                              false,                     //no boolean operat
+                              0);                        //copy number
+
+    G4RotationMatrix* zRot = new G4RotationMatrix;  // Rotates X and y axes only
+    zRot->rotateZ(M_PI*rad);
+
+    new G4PVPlacement(zRot,                   //no rotation
+                      G4ThreeVector(0.,-frontPlateX/2+tbPlateY/2.,0.),    //its position //
+                              TBPlateLV,            //its logical volume
+                              "TopPlate",                 //its name
+                              logicCaloMother,               //its mother
+                              false,                     //no boolean operat
+                              1);                        //copy number
+  
+  }
+
+return logicCaloMother;
 } 
 
+void Calorimeter::ConstructCalorimeterSD(){
+  if (fConfig.GetConfigValueAsInt("Calorimeter","frontDetector")){
+    std::string ntupleName = "inFrontCalo";
+    auto& mapping = fAnaConfigManager.GetNtupleNameToIdMap();
+    auto it = mapping.find(ntupleName);
+      if (it != mapping.end()) {
+          int ID = it->second;
+          G4cout << "--------0000000000000----------- ::: THE TUPLE ID IS:" << ID << G4endl;
+          auto sdIC = new CaloFrontSensitiveDetector(ntupleName, ntupleName, ID, fAnaConfigManager);
+          G4SDManager::GetSDMpointer()->AddNewDetector(sdIC);
+          // Retrieve the logical volume for this layer and set its SD
+          fLogicFrontDet->SetSensitiveDetector(sdIC );
+      }
+  }
+  if (fConfig.GetConfigValueAsInt("Calorimeter","crystDetector")){
+    std::string ntupleName = "CaloCrystal";
+    auto& mapping = fAnaConfigManager.GetNtupleNameToIdMap();
+    auto it = mapping.find(ntupleName);
+      if (it != mapping.end()) {
+          int ID = it->second;
+          G4cout << "--------0000000000000----------- ::: THE TUPLE ID IS:" << ID << G4endl;
+          auto sdCC = new CaloCrystalSD(ntupleName, ntupleName, ID, fAnaConfigManager);
+          G4SDManager::GetSDMpointer()->AddNewDetector(sdCC);
+          // Retrieve the logical volume for this layer and set its SD
+          fLogicCrystal->SetSensitiveDetector(sdCC );
+      }
+  }
+}

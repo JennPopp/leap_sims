@@ -25,8 +25,12 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     macroFile << "/run/initialize" << std::endl; 
 
     // polarization manager, only callable ofter initialization -----------------------------------
-    macroFile << "/polarization/manager/verbose 1" << std::endl;
-    macroFile << "/polarization/volume/list" << std::endl;
+    auto solenoidStatus = config.GetConfigValueAsInt("Solenoid","solenoidStatus");
+    if (solenoidStatus){
+        macroFile << "/polarization/manager/verbose 1" << std::endl;
+        macroFile << "/polarization/volume/list" << std::endl;
+    }
+    
 
     // gps commands -------------------------------------------------------------------------------
     int nBunch = config.GetConfigValueAsInt("GPS","nBunch");

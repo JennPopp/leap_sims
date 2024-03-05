@@ -30,7 +30,9 @@ private:
     G4double fPolDeg;
     G4String fType; // TP1 was used for design study, TP2 is in the lab
     G4int fPolStatus;
-    //G4String fBeamLineStatus;
+    G4int fBeamLineStatus;
+    G4int fLanexStatus;
+    G4int fTableStatus;
     G4String fWorldMaterial;
     G4LogicalVolume* fLogicVacStep1;
     G4LogicalVolume* fLogicVacStep2;

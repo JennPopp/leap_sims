@@ -39,7 +39,9 @@ Solenoid::Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManage
     fCoreLength = config.GetConfigValueAsDouble("Solenoid", "coreLength")*mm;
     fConvThick = config.GetConfigValueAsDouble("Solenoid", "convThick")*mm;
     fPolStatus = config.GetConfigValueAsInt("PhysicsList", "polarizationStatus");
-    //fBeamLineStatus = config.GetConfigValue("BeamLine", "beamLineStatus");
+    fLanexStatus = config.GetConfigValueAsInt("Solenoid", "LanexStatus");
+    fTableStatus = config.GetConfigValueAsInt("Solenoid", "TableStatus");
+    fBeamLineStatus = config.GetConfigValueAsInt("BeamLine", "beamLineStatus");
     fType = config.GetConfigValue("Solenoid", "type");
     fWorldMaterial = config.GetConfigValue("World", "material");
     fPolDeg = config.GetConfigValueAsDouble("GPS","polDeg");
@@ -60,7 +62,10 @@ G4LogicalVolume* Solenoid::ConstructSolenoid() {
     G4double shieldThick = fCoreLength - 25*mm;
     G4double coreGap = 12.5*mm;
     G4double vacThick = 1*mm; // TP2: dist core and cone TP1: dist core and conv
-    
+    G4double lanexRad = 76.2*mm;
+    G4double lanexThick = 0.5*mm;
+    // Add values for Table  
+
     G4double rMax, rOpen, rOuterCoil, coneDist;
     if (fType == "TP2"){
       rMax = 162.0*mm;
@@ -88,6 +93,8 @@ G4LogicalVolume* Solenoid::ConstructSolenoid() {
     G4Material* copper = Materials::GetInstance()->GetMaterial("G4_Cu");
     G4Material* tungsten = Materials::GetInstance()->GetMaterial("G4_W");
     G4Material* worldMat = Materials::GetInstance()->GetMaterial(fWorldMaterial);
+    //G4Material* Steel = Materials::GetInstance()->GetMaterial("G4_STAINLESS-STEEL");
+    G4Material* lanex = Materials::GetInstance()->GetMaterial("G4_GADOLINIUM_OXYSULFIDE");
     
     //---------------------------------------------------------------
     // mother volume of the solenoid  
@@ -296,6 +303,38 @@ G4LogicalVolume* Solenoid::ConstructSolenoid() {
                       false,                     //no boolean operat
                       0);                        //copy number
 
+    if((fBeamLineStatus==1) || (fLanexStatus!=0)){
+      G4Tubs* solidLanex = new G4Tubs("solidLanex", // name of the solid 
+                                    0.0*mm, // inner radius 
+                                    lanexRad, // outer radius 
+                                    lanexThick/2, // half length  
+                                    0.0*deg, //starting angle 
+                                    360.0*deg );// end angle 
+
+      G4LogicalVolume* logicLanex = new G4LogicalVolume(solidLanex, // solid
+                                                      lanex, // material 
+                                                      "logicLanex"); // name of logical volume 
+
+      new G4PVPlacement(0, // no rotation
+                        G4ThreeVector(0,0,-fMagThick/2.-lanexThick/2.), // position
+                        logicLanex, // its logical volume 
+                        "physLanex", // name of physical volume
+                        logicSolenoid, // its mother volume 
+                        false, // no boolean operation
+                        0); // copy number 
+
+      new G4PVPlacement(0, // no rotation
+                        G4ThreeVector(0,0,fMagThick/2.+lanexThick/2.), // position
+                        logicLanex, // its logical volume 
+                        "physLanex", // name of physical volume
+                        logicSolenoid, // its mother volume 
+                        false, // no boolean operation
+                        1); // copy number 
+    }
+
+    
+
+    // Add Table 
 
     return logicSolenoid;
 }

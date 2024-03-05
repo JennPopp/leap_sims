@@ -1,6 +1,6 @@
 // Calorimeter.h
 #ifndef Calorimeter_h
-#define SCalorimeter_h 1
+#define Calorimeter_h 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "ConfigReader.hh"

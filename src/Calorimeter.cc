@@ -3,7 +3,6 @@
 #include "Calorimeter.hh"
 #include "Materials.hh"
 #include "ConfigReader.hh"
-// need to include sensitive detectors 
 #include "CaloFrontSensitiveDetector.hh"
 #include "CaloCrystalSD.hh"
 

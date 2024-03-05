@@ -6,6 +6,7 @@
 #include "ConfigReader.hh"
 #include "Solenoid.hh"
 #include "Calorimeter.hh"
+#include "BeamLine.hh"
 
 namespace leap
 {
@@ -31,6 +32,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     // pointers to subdetectors 
     Solenoid* fSolenoid;
     Calorimeter* fCalo;
+    BeamLine* fBeamLine;
 
     //other member variables 
     G4double fDist2Pol;

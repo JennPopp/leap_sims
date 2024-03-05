@@ -19,6 +19,8 @@ DetectorConstruction::DetectorConstruction(const ConfigReader& config, AnaConfig
     // Create instances of subdetectors and pass the confic object
     fSolenoid = new Solenoid(config, anaConfigManager);
     fCalo = new Calorimeter(config, anaConfigManager);
+    fBeamLine = new BeamLine(config, anaConfigManager);
+
 
     //initialize other geometry member variables 
     if (fConfig.GetConfigValueAsInt("Solenoid","solenoidStatus")){
@@ -32,21 +34,34 @@ DetectorConstruction::DetectorConstruction(const ConfigReader& config, AnaConfig
 DetectorConstruction::~DetectorConstruction() {
   delete fSolenoid;
   delete fCalo; 
+  delete fBeamLine;
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4VPhysicalVolume* DetectorConstruction::Construct() {
 
-  // world volume 
-  G4double worldSize = 2000*mm;
+  // world volume................................................................ 
+  G4double worldSize = 4000*mm;
   G4Box* solidWorld = new G4Box("solidWorld", worldSize, worldSize, worldSize);
   G4LogicalVolume* logicWorld = new G4LogicalVolume(solidWorld, Materials::GetInstance()->GetMaterial("G4_AIR"), "logicWorld");
   G4VPhysicalVolume* physWorld = new G4PVPlacement(0, G4ThreeVector(), logicWorld, "physWorld", 0, false, 0);
 
+  // place the beamline .........................................................
+  if(fConfig.GetConfigValueAsInt("BeamLine","beamLineStatus")){
+    G4LogicalVolume* logicBeamLine = fBeamLine->ConstructBeamLine();
+    G4double lengthBL = fBeamLine->GetLengthBL();
+    new G4PVPlacement(0,
+                      G4ThreeVector(0,0,-lengthBL/2.0+1*mm), 
+                      logicBeamLine, 
+                      "physicalBeamLine", 
+                      logicWorld, 
+                      false, 
+                      0); 
+
+  }
+  // The solenoid ...............................................................
 
   G4double magThick = 0;
-  // Place the solenoid into the world 
-  // create an instance of the solenoid class
   if (fConfig.GetConfigValueAsInt("Solenoid","solenoidStatus")){
     G4LogicalVolume* logicSolenoid = fSolenoid->ConstructSolenoid();
     magThick = fSolenoid->GetMagThick();

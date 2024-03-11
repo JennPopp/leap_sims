@@ -23,6 +23,7 @@ DetectorConstruction::DetectorConstruction(const ConfigReader& config, AnaConfig
 
 
     //initialize other geometry member variables 
+    fWorldMaterial = config.GetConfigValue("World", "material");
     if (fConfig.GetConfigValueAsInt("Solenoid","solenoidStatus")){
       fDist2Pol = config.GetConfigValueAsDouble("Calorimeter","dist2Pol")*mm;
     } else {
@@ -42,8 +43,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
 
   // world volume................................................................ 
   G4double worldSize = 4000*mm;
+  G4Material* worldMat = Materials::GetInstance()->GetMaterial(fWorldMaterial);
   G4Box* solidWorld = new G4Box("solidWorld", worldSize, worldSize, worldSize);
-  G4LogicalVolume* logicWorld = new G4LogicalVolume(solidWorld, Materials::GetInstance()->GetMaterial("G4_AIR"), "logicWorld");
+  G4LogicalVolume* logicWorld = new G4LogicalVolume(solidWorld, worldMat, "logicWorld");
   G4VPhysicalVolume* physWorld = new G4PVPlacement(0, G4ThreeVector(), logicWorld, "physWorld", 0, false, 0);
 
   // place the beamline .........................................................

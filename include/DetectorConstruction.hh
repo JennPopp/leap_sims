@@ -36,6 +36,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 
     //other member variables 
     G4double fDist2Pol;
+    G4String fWorldMaterial;
     
 
 };

@@ -1,0 +1,25 @@
+#ifndef SolenoidMessenger_h
+#define SolenoidMessenger_h
+
+#include "G4UImessenger.hh"
+#include "G4UIcommand.hh"
+#include "G4UIparameter.hh"
+#include "G4UIcmdWithADoubleAndUnit.hh"
+
+// Forward declaration
+class Solenoid;
+
+class SolenoidMessenger : public G4UImessenger {
+private:
+    Solenoid* fSolenoid; // Pointer to the solenoid
+    G4UIcmdWithADoubleAndUnit* fSetBzCmd; // Command to set fBz
+    G4UIdirectory* fDirectory;
+
+public:
+    SolenoidMessenger(Solenoid* solenoid);
+    ~SolenoidMessenger();
+
+    void SetNewValue(G4UIcommand* command, G4String newValue) override;
+};
+
+#endif // SolenoidMessenger_h

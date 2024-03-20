@@ -4,6 +4,7 @@
 #include "ConfigReader.hh"
 #include "BaseSensitiveDetector.hh"
 #include "AnaConfigManager.hh"
+#include "SolenoidMessenger.hh"
 
 #include "G4Tubs.hh"
 #include "G4Box.hh"
@@ -34,7 +35,7 @@ const std::string red = "\033[31m";
 const std::string reset = "\033[0m";
 
 Solenoid::Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManager)
-  : fConfig(config), fAnaConfigManager(anaConfigManager) {
+  : fConfig(config), fAnaConfigManager(anaConfigManager), fMessenger(new SolenoidMessenger(this)){
     // Read configuration values and initialize the subdetector
     fCoreRad = config.GetConfigValueAsDouble("Solenoid", "coreRad")*mm;
     fCoreLength = config.GetConfigValueAsDouble("Solenoid", "coreLength")*mm;
@@ -45,12 +46,14 @@ Solenoid::Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManage
     fBeamLineStatus = config.GetConfigValueAsInt("BeamLine", "beamLineStatus");
     fType = config.GetConfigValue("Solenoid", "type");
     fWorldMaterial = config.GetConfigValue("World", "material");
-    fPolDeg = config.GetConfigValueAsDouble("GPS","polDeg");
+    fPolDeg = config.GetConfigValueAsDouble("Solenoid","polDeg");
 
     fBz = config.GetConfigValueAsDouble("Solenoid","Bz");
 }
 
-Solenoid::~Solenoid() {}
+Solenoid::~Solenoid() {
+  delete fMessenger;
+}
 
 G4LogicalVolume* Solenoid::ConstructSolenoid() {
 
@@ -415,4 +418,8 @@ void Solenoid::ConstructSolenoidBfield(){
   fLogicCore->SetFieldManager(fieldMgr, true);
 
 
+}
+
+void Solenoid::SetBz(G4double newBz) {
+    fBz = newBz;
 }

@@ -5,6 +5,7 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "ConfigReader.hh"
 #include "AnaConfigManager.hh"
+#include "SolenoidMessenger.hh"
 
 class Solenoid{
 public:
@@ -17,6 +18,7 @@ public:
     G4LogicalVolume* ConstructSolenoid();
     void ConstructSolenoidSD();
     void ConstructSolenoidBfield();
+    void SetBz(G4double newBz);
 
      // Getter method for magThick
     G4double GetMagThick() const { return fMagThick; }
@@ -24,6 +26,7 @@ public:
 private:
     const ConfigReader& fConfig;
     AnaConfigManager& fAnaConfigManager;
+    SolenoidMessenger* fMessenger;
     G4double fCoreRad;
     G4double fCoreLength;
     G4double fConvThick; 

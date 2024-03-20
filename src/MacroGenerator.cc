@@ -77,18 +77,36 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
         macroFile << "/control/execute" << histname << std::endl;
     }
 
+    std::string runType = config.GetConfigValue("Run","type");
+    std::string Nevents = config.GetConfigValue("Run","Nevents");
     std::string polDeg = config.GetConfigValue("GPS","polDeg"); 
+    std::string Bz = config.GetConfigValue("Solenoid","Bz");
 
-    // one run in each polarization direction !----------------------------------------------------  
+    if (runType=="asymmetry" && polDeg!="0"){
+        // one run in each polarization direction !----------------------------------------------------  
 
-    macroFile << "/gps/polarization 0. 0. " << polDeg << std::endl;
+        macroFile << "/gps/polarization 0. 0. " << polDeg << std::endl;
 
-    macroFile << "/run/beamOn 1" << std::endl;
+        macroFile << "/run/beamOn " << Nevents << std::endl;
 
-    macroFile << "/gps/polarization 0. 0. -" << polDeg << std::endl;
+        macroFile << "/gps/polarization 0. 0. -" << polDeg << std::endl;
 
-    macroFile << "/run/beamOn 1" << std::endl;
-    
+        macroFile << "/run/beamOn " << Nevents << std::endl;
+
+    } else if (runType=="asymmetry" && polDeg=="0"){
+        // one run with magnet and iron polarization in one direction and one in the other 
+        
+        // for the first run the value spezified in the macro is used e.g. 2.2 T
+        macroFile << "/run/beamOn " << Nevents << std::endl;
+
+        //Then the Bfield needs to be changed to the negative value 
+        macroFile << "/solenoid/setBz -" << Bz << " tesla" << std::endl;
+        macroFile << "/run/beamOn " << Nevents << std::endl;
+
+    } else {
+        // single run with N events  
+        macroFile << "/run/beamOn " << Nevents << std::endl;
+    } 
     // Close the file
     macroFile.close();
 }

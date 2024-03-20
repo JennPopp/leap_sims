@@ -331,7 +331,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
     }
 
     //
-    // Top and botto aluminium plates -----------------------------------------------------------
+    // Top and bottom aluminium plates -----------------------------------------------------------
     //
     G4double tbPlateY= 20*mm;
     auto TBPlateBox = new G4Box("TBPlateBox",  //Name

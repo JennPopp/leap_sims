@@ -8,7 +8,6 @@
 #include "G4PVPlacement.hh"
 #include "G4Box.hh"
 #include "G4SystemOfUnits.hh"
-
 namespace leap
 {
 

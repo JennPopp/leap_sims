@@ -42,11 +42,18 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     std::string position = config.GetConfigValue("GPS","position");
     macroFile <<"/gps/pos/centre " << position << " mm" << std::endl; 
 
-    macroFile << "/gps/pos/type Beam" << std::endl;
-
+    std::string posType = config.GetConfigValue("GPS","posType");
     std::string spotSize = config.GetConfigValue("GPS","spotSize");
-    macroFile << "/gps/pos/sigma_x "<< spotSize << " mm" << std::endl;
-    macroFile << "/gps/pos/sigma_y "<< spotSize << " mm" << std::endl;
+
+    macroFile << "/gps/pos/type " << posType  <<std::endl;
+
+    if (posType == "Beam"){
+        macroFile << "/gps/pos/shape Circle" << std::endl;
+        macroFile << "/gps/pos/radius " << spotSize << " mm" << std::endl;
+    }else{
+        macroFile << "/gps/pos/sigma_x "<< spotSize << " mm" << std::endl;
+        macroFile << "/gps/pos/sigma_y "<< spotSize << " mm" << std::endl;
+    }
 
     macroFile << "/gps/ang/type beam2d"<< std::endl;
 

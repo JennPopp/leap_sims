@@ -94,10 +94,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
 void DetectorConstruction::ConstructSDandField(){
   if (fConfig.GetConfigValueAsInt("Solenoid","solenoidStatus")){
     fSolenoid->ConstructSolenoidSD();
+    
+    if(fConfig.GetConfigValueAsInt("Solenoid","BField")){
+      fSolenoid->ConstructSolenoidBfield();
+    }
   } 
-  if(fConfig.GetConfigValueAsInt("Solenoid","BField")){
-    fSolenoid->ConstructSolenoidBfield();
-  }
+
   if(fConfig.GetConfigValueAsInt("Calorimeter","calorimeterStatus")){
     fCalo->ConstructCalorimeterSD();
   }

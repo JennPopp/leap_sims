@@ -47,7 +47,7 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
 
     macroFile << "/gps/pos/type " << posType  <<std::endl;
 
-    if (posType == "Beam"){
+    if (posType == "Volume"){
         macroFile << "/gps/pos/shape Circle" << std::endl;
         macroFile << "/gps/pos/radius " << spotSize << " mm" << std::endl;
     }else{

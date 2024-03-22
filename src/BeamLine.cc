@@ -75,7 +75,8 @@ G4LogicalVolume* BeamLine::ConstructBeamLine(){
         // make sure that the material you want to used is provided in Materials.cc
         G4Material* PEEK = Materials::GetInstance()->GetMaterial("PEEK");
         G4Material* worldMat = Materials::GetInstance()->GetMaterial(fWorldMaterial);
-        
+        G4Material* silicon = Materials::GetInstance()->GetMaterial("G4_Si");
+        G4Material* plasticScintillator = Materials::GetInstance()->GetMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
         
         //---Mother Volume of the BeamLine------------------------------------
         G4Box* solidBLMother = new G4Box("solidBLMother",  //Name
@@ -97,7 +98,7 @@ G4LogicalVolume* BeamLine::ConstructBeamLine(){
                                             PlaineThick/2.); // z size
 
         G4LogicalVolume* logicPlane = new G4LogicalVolume(solidPlane,    //its solid
-                                            PEEK,    //its material
+                                            silicon,    //its material
                                           "logicPlane");       //its name
 
         for (G4int i=0;i<=Nplanes-1;i++){
@@ -117,7 +118,7 @@ G4LogicalVolume* BeamLine::ConstructBeamLine(){
                                             SFthick/2.); // z size
 
         G4LogicalVolume* logicSF= new G4LogicalVolume(solidSF,    //its solid
-                                            PEEK,    //its material
+                                            plasticScintillator,    //its material
                                           "logicSF");       //its name   
 
         new G4PVPlacement(0,		       //no rotation

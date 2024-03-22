@@ -28,6 +28,9 @@ DetectorConstruction::DetectorConstruction(const ConfigReader& config, AnaConfig
     } else {
       fDist2Pol = 0*mm;
     }
+    
+    fcaloXpos = config.GetConfigValueAsDouble("Calorimeter","xpos")*mm;
+    fcaloYpos = config.GetConfigValueAsDouble("Calorimeter","ypos")*mm;
   }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -80,7 +83,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
     G4double caloLength = fCalo->GetVirtCaloLength();
     G4cout << ".....................................................................................................caloLength is "<< caloLength << G4endl;
     new G4PVPlacement(0,
-                      G4ThreeVector(0,0,magThick+fDist2Pol+caloLength/2.), 
+                      G4ThreeVector(fcaloXpos,fcaloYpos,magThick+fDist2Pol+caloLength/2.), 
                       logicCalo, 
                       "physicalCalo", 
                       logicWorld, 

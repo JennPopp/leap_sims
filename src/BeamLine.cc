@@ -45,26 +45,42 @@ G4LogicalVolume* BeamLine::ConstructBeamLine(){
         // as well hardcode it here 
 
         // Geometry Parameters-----------------------------------------------
-        G4double dist_to_calo = 2.0*m;
-        G4double planeXY = 3.00 *cm;
-        G4double planeZ = 0.5 *mm;
-        G4double Nplanes = 4;
-        G4double planeDist = 3.0*cm;
-        G4double planePos[4]={-dist_to_calo/2., 
-                                -dist_to_calo/2.+planeDist+planeZ/2,
-                                -dist_to_calo/2.+2*planeDist+planeZ*3/2,
-                                -dist_to_calo/2.+3*planeDist+planeZ*5/2};
+        G4double dist_to_calo = 956*m;
+        G4double PlaineHight = 5.00 *cm;
+        G4double PlaineThick = 0.5 *mm;
+        G4double Nplanes = 6;
+        G4double SFthick = 10 *mm ;
+        G4double SFhight= 20 *mm;
+        G4double SFwide = 50 *mm ; 
+        //here I provide the distance of each telescope plane center to world z = 0 (Asuming Calo front at z = 0!!!)
+        G4double SFpos = -1887*mm;
+        G4double plane0 = -1864 *mm;
+        G4double plane1 = -1718 *mm;
+        G4double plane2 = -1628 *mm;
+        G4double plane3 = -1188 *mm;
+        G4double plane4 = -991 *mm;
+        G4double plane5 = -964 *mm;
 
+        //----Length of the beamline -> z length of the mother volume---------
+        fLengthBL =  -SFpos + SFthick/2.;
+        //----Positioning of the telescope planes and the SF (Scintilator Fingers) in the beamline mother 
+        G4double planePos[6]={plane0+fLengthBL/2., 
+                              plane1+fLengthBL/2.,
+                              plane2+fLengthBL/2.,
+                              plane3+fLengthBL/2.,
+                              plane4+fLengthBL/2.,
+                              plane5+fLengthBL/2.};
+        G4double SFposBL = SFpos + fLengthBL/2.;
         //materials----------------------------------------------------------
         // make sure that the material you want to used is provided in Materials.cc
         G4Material* PEEK = Materials::GetInstance()->GetMaterial("PEEK");
         G4Material* worldMat = Materials::GetInstance()->GetMaterial(fWorldMaterial);
-        //----Length of the beamline -> z length of the mother volume---------
-        fLengthBL =  Nplanes*planeZ+(Nplanes-1)*planeDist+dist_to_calo;
+        
+        
         //---Mother Volume of the BeamLine------------------------------------
         G4Box* solidBLMother = new G4Box("solidBLMother",  //Name
-                                            planeXY/2.,   // x size
-                                            planeXY/2.,     // y size
+                                            PlaineHight/2.,   // x size
+                                            PlaineHight/2.,     // y size
                                             fLengthBL/2.); // z size
         // using the convention of putting an f in front of member variables
         fLogicBLMother = new G4LogicalVolume(solidBLMother,    //its solid
@@ -73,11 +89,12 @@ G4LogicalVolume* BeamLine::ConstructBeamLine(){
 
         //make virtual mother volume invisible
         fLogicBLMother->SetVisAttributes(G4VisAttributes::GetInvisible());
+
         //---The telescope Planes----------------------------------------------
         G4Box* solidPlane = new G4Box("solidPlane",  //Name
-                                            planeXY/2.,   // x size
-                                            planeXY/2.,     // y size
-                                            planeZ/2.); // z size
+                                            PlaineHight/2.,   // x size
+                                            PlaineHight/2.,     // y size
+                                            PlaineThick/2.); // z size
 
         G4LogicalVolume* logicPlane = new G4LogicalVolume(solidPlane,    //its solid
                                             PEEK,    //its material
@@ -87,12 +104,30 @@ G4LogicalVolume* BeamLine::ConstructBeamLine(){
             new G4PVPlacement(0,		       //no rotation
                             G4ThreeVector(0,0,planePos[i]),  //its position
                             logicPlane,            //its logical volume
-                            "physCaloCell",    //its name
+                            "physTelescopePlane",    //its name
                             fLogicBLMother,               //its mother
                             false,                     //no boolean operat
                             i,                              //copy number       //copy number
                             true);                     // check overlap    
             }
+        //---The telescope Planes----------------------------------------------
+        G4Box* solidSF= new G4Box("solidSF",  //Name
+                                            SFwide/2.,   // x size
+                                            SFhight/2.,     // y size
+                                            SFthick/2.); // z size
+
+        G4LogicalVolume* logicSF= new G4LogicalVolume(solidSF,    //its solid
+                                            PEEK,    //its material
+                                          "logicSF");       //its name   
+
+        new G4PVPlacement(0,		       //no rotation
+                        G4ThreeVector(0,0,SFposBL),  //its position
+                        logicSF,            //its logical volume
+                        "physSF",    //its name
+                        fLogicBLMother,               //its mother
+                        false,                     //no boolean operat
+                        0,                              //copy number  
+                        true);                     // check overlap    
     } else {
         // construct the 28m setup
 

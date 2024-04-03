@@ -81,7 +81,7 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
         macroFile << "/gps/hist/type energy" << std::endl;
 
         std::string histname = config.GetConfigValue("GPS", "histname");
-        macroFile << "/control/execute" << histname << std::endl;
+        macroFile << "/control/execute " << histname << std::endl;
     }
 
     std::string runType = config.GetConfigValue("Run","type");

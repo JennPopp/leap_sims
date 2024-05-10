@@ -105,6 +105,11 @@ void AnaConfigManager::FillCaloFrontTuple_detailed(int tupleID,const G4VTouchabl
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     auto track = step->GetTrack();
     auto PSP = step->GetPostStepPoint();
+    int motherdepth = 1; 
+    if (step->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "VacStep4") {
+        motherdepth = 2; 
+    }
+
     analysisManager->FillNtupleIColumn(tupleID,0, track->GetParticleDefinition()->GetPDGEncoding());
 
     analysisManager->FillNtupleDColumn(tupleID,1, PSP->GetTotalEnergy()/CLHEP::MeV);
@@ -129,7 +134,7 @@ void AnaConfigManager::FillCaloFrontTuple_detailed(int tupleID,const G4VTouchabl
     analysisManager->FillNtupleDColumn(tupleID,15, track->GetParentID());
     analysisManager->FillNtupleDColumn(tupleID,16, G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID());
 
-    analysisManager->FillNtupleIColumn(tupleID,17, history->GetReplicaNumber(1));
+    analysisManager->FillNtupleIColumn(tupleID,17, history->GetReplicaNumber(motherdepth));
     analysisManager->AddNtupleRow(tupleID);
 };
 

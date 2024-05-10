@@ -134,7 +134,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
 
   G4double calocellZpos;
   
-  if(fType=="full"){calocellZpos=-tbPlateZ/2+frontPlateZ+9*mm+calorcelllength/2+1*mm;;}
+  if(fType=="full"){calocellZpos=-tbPlateZ/2+frontPlateZ+9*mm+calorcelllength/2+1*mm;}
   else{calocellZpos=0;}
 
   if(fNcrystals==9){
@@ -175,7 +175,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
 
 
   auto logicAluWrap = new G4LogicalVolume(solidAluWrap,    //its solid
-                                          Al,    //its material
+                                          Al,    //its material , changed it form Al to world material to test it 
                                           "logicAluWrapping");       //its name
 
   new G4PVPlacement(0,                   //no rotation
@@ -202,7 +202,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
 
 
   auto logicAirGap = new G4LogicalVolume(solidAirGap,    //its solid
-                                        Air,    //its material
+                                        worldMat,    //its material chagend it to world material form Air 
                                         "logicAirGap");       //its name
 
   new G4PVPlacement(0,                   //no rotation
@@ -392,6 +392,19 @@ void Calorimeter::ConstructCalorimeterSD(){
           G4SDManager::GetSDMpointer()->AddNewDetector(sdIC);
           // Retrieve the logical volume for this layer and set its SD
           fLogicFrontDet->SetSensitiveDetector(sdIC );
+      }
+  }
+  if (fConfig.GetConfigValueAsInt("Calorimeter","backDetector")){
+    std::string ntupleName = "behindCalo";
+    auto& mapping = fAnaConfigManager.GetNtupleNameToIdMap();
+    auto it = mapping.find(ntupleName);
+      if (it != mapping.end()) {
+          int ID = it->second;
+          G4cout << "--------0000000000000----------- ::: THE TUPLE ID IS:" << ID << G4endl;
+          auto sdBC = new CaloFrontSensitiveDetector(ntupleName, ntupleName, ID, fAnaConfigManager);
+          G4SDManager::GetSDMpointer()->AddNewDetector(sdBC);
+          // Retrieve the logical volume for this layer and set its SD
+          fLogicBackDet->SetSensitiveDetector(sdBC);
       }
   }
   if (fConfig.GetConfigValueAsInt("Calorimeter","crystDetector")){

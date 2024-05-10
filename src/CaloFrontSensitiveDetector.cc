@@ -31,7 +31,12 @@ G4bool CaloFrontSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*
             fAnaConfigManager.FillCaloFrontTuple_detailed(fTupleID, touchable, step);
         } else { // outputmode == summary as default 
             auto touchable = step->GetPreStepPoint()->GetTouchable();
-            int crystNo = touchable->GetReplicaNumber(1);
+            int motherdepth = 1; 
+            if (step->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "VacStep4") {
+                motherdepth = 2; 
+            }
+            int crystNo = touchable->GetReplicaNumber(motherdepth);
+            // G4cout << "ProcessHits called for volume: " << step->GetPreStepPoint()->GetPhysicalVolume()->GetName() << motherdepth << crystNo << G4endl;
             G4double ene = step->GetPostStepPoint()->GetTotalEnergy()/MeV;
             // always add to total energy sum and total number of particles 
             //G4cout << fEnergySum[crystNo] << "+=" << ene << G4endl;

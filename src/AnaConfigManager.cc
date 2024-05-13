@@ -107,7 +107,7 @@ void AnaConfigManager::FillCaloFrontTuple_detailed(int tupleID,const G4VTouchabl
     auto PSP = step->GetPostStepPoint();
     int motherdepth = 1; 
     if (step->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "VacStep4") {
-        motherdepth = 2; 
+        motherdepth = 1;// changed the mother volume of the Vacstep4 to calovirtuel volume so not motherdepth = 2 ( for Alu as mother) but same as Fontdetector 1  
     }
 
     analysisManager->FillNtupleIColumn(tupleID,0, track->GetParticleDefinition()->GetPDGEncoding());

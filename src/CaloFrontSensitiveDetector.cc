@@ -33,7 +33,7 @@ G4bool CaloFrontSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*
             auto touchable = step->GetPreStepPoint()->GetTouchable();
             int motherdepth = 1; 
             if (step->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "VacStep4") {
-                motherdepth = 2; 
+                motherdepth = 1; // changed the mother volume of the Vacstep4 to calovirtuel volume so not motherdepth =2 ( for Alu as mother) but same as Fontdetector 1 
             }
             int crystNo = touchable->GetReplicaNumber(motherdepth);
             // G4cout << "ProcessHits called for volume: " << step->GetPreStepPoint()->GetPhysicalVolume()->GetName() << motherdepth << crystNo << G4endl;

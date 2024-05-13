@@ -179,7 +179,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                           "logicAluWrapping");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,detThick/2),    //its position // old 0.,0.,-vacthick/2
+                    G4ThreeVector(0.,0.,0.),    //its position // old 0.,0.,-detThick/2 
                             logicAluWrap,            //its logical volume
                             "physAluWrapping",                 //its name
                             logicCaloCell,               //its mother
@@ -206,7 +206,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                         "logicAirGap");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,-(aluwrapthick)/2),    //its position // old 0.,0.,aluwrapthick/2
+                    G4ThreeVector(0.,0.,aluwrapthick),    //its position // old 0.,0.,-(aluwrapthick)/2
                     logicAirGap,            //its logical volume
                     "AlAirGap",                 //its name
                     logicAluWrap,               //its mother
@@ -226,7 +226,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                         "logicCrystal");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,alairgapthick/2),    //its position
+                    G4ThreeVector(0.,0.,alairgapthick),    //its position old 0.,0.,alairgapthick/2
                     fLogicCrystal,            //its logical volume
                     "solidCrystal",                 //its name
                     logicAirGap,               //its mother
@@ -244,8 +244,8 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
   //---------------------------------------------------------------
 
   G4Box* solidVacStep = new G4Box("solidVacStepCalo",  //Name
-                                  crystXY/2.,
-                                  crystXY/2,
+                                  calorcellxy/2.,// former cystalXY now size of the calo chell 
+                                  calorcellxy/2,// former cystalXY now size of the calo chell 
                                   detThick/2.);
 
   fLogicFrontDet = new G4LogicalVolume(solidVacStep,    //its solid
@@ -253,7 +253,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                         "logicCaloFrontDet");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,-(aluwraplength/2+detThick/2.)),    //its position 
+                    G4ThreeVector(0.,0., -calorcelllength/2+detThick/2),    //its position old 0.,0.,-(aluwraplength/2+detThick/2.)
                     fLogicFrontDet,            //its logical volume
                     "physCaloFrontDet",                 //its name
                     logicCaloCell,               //its mother //old fCaloCellLV
@@ -266,13 +266,19 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                           "VacStep4");       //its name
 
    new G4PVPlacement(0,                   //no rotation
-                        G4ThreeVector(0.,0.,(aluwrapthick+alairgaplength)/2),    //its position 
+                        G4ThreeVector(0.,0.,calorcelllength/2-detThick/2),    //its position old 0.,0.,(aluwrapthick+alairgaplength)/2
                         fLogicBackDet,            //its logical volume
                         "VacStep4",                 //its name
-                        logicAluWrap,               //its mother //old fCaloCellLV
+                        logicCaloCell,               //its mother //old logicAluWrap
                         false,                     //no boolean operat
                         0);                        //copy number
 
+  G4VisAttributes * DetVis= new G4VisAttributes( G4Colour(242/255. ,142/255. ,0/255. ));
+  DetVis->SetVisibility(true);
+  DetVis->SetLineWidth(2);
+  DetVis->SetForceSolid(true);
+  fLogicBackDet->SetVisAttributes(DetVis);                     
+  fLogicFrontDet->SetVisAttributes(DetVis);  
   //---------------------------------------------------------------
   // If the full calorimeter is simulated -> also build housing    
   //---------------------------------------------------------------

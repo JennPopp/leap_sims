@@ -31,6 +31,11 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
         macroFile << "/polarization/volume/list" << std::endl;
     }
     
+    // test the step sice stuff--------------------------------------------------------------------
+    // macroFile <<"/testem/stepMax" << " 0.1 mm" << std::endl;
+    // test energy cutoff 
+    // macroFile <<"/process/em/lowestElectronEnergy" << " 8 MeV" << std::endl;
+    // macroFile <<"/run/setCut"<< " 0.01 mm" << std::endl;
 
     // gps commands -------------------------------------------------------------------------------
     int nBunch = config.GetConfigValueAsInt("GPS","nBunch");

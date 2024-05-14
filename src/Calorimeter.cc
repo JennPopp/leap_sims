@@ -47,6 +47,8 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
     //---------------------------------------------------------------
     G4double crystThick = 45.*cm; // length of the lead glass crystals
     G4double crystXY = 3.8*cm; // width in x/y of crystals
+    // G4double crystThick = 200.*cm; // length of the lead glass crystals
+    // G4double crystXY = 200*cm; // width in x/y of crystals
     G4double detThick = 1.0*mm; // thickness of virtual detectors 
 
     G4double alairgapthick = 0.001 *mm;   // thickness of the air gap between
@@ -134,7 +136,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
 
   G4double calocellZpos;
   
-  if(fType=="full"){calocellZpos=-tbPlateZ/2+frontPlateZ+9*mm+calorcelllength/2+1*mm;;}
+  if(fType=="full"){calocellZpos=-tbPlateZ/2+frontPlateZ+9*mm+calorcelllength/2+1*mm;}
   else{calocellZpos=0;}
 
   if(fNcrystals==9){
@@ -175,11 +177,11 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
 
 
   auto logicAluWrap = new G4LogicalVolume(solidAluWrap,    //its solid
-                                          Al,    //its material
+                                          Al,    //its material , changed it form Al to world material to test it 
                                           "logicAluWrapping");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,detThick/2),    //its position // old 0.,0.,-vacthick/2
+                    G4ThreeVector(0.,0.,0.),    //its position // old 0.,0.,-detThick/2 
                             logicAluWrap,            //its logical volume
                             "physAluWrapping",                 //its name
                             logicCaloCell,               //its mother
@@ -202,11 +204,11 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
 
 
   auto logicAirGap = new G4LogicalVolume(solidAirGap,    //its solid
-                                        Air,    //its material
+                                        worldMat,    //its material chagend it to world material form Air 
                                         "logicAirGap");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,-(aluwrapthick)/2),    //its position // old 0.,0.,aluwrapthick/2
+                    G4ThreeVector(0.,0.,aluwrapthick),    //its position // old 0.,0.,-(aluwrapthick)/2
                     logicAirGap,            //its logical volume
                     "AlAirGap",                 //its name
                     logicAluWrap,               //its mother
@@ -226,7 +228,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                         "logicCrystal");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,alairgapthick/2),    //its position
+                    G4ThreeVector(0.,0.,alairgapthick),    //its position old 0.,0.,alairgapthick/2
                     fLogicCrystal,            //its logical volume
                     "solidCrystal",                 //its name
                     logicAirGap,               //its mother
@@ -244,8 +246,8 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
   //---------------------------------------------------------------
 
   G4Box* solidVacStep = new G4Box("solidVacStepCalo",  //Name
-                                  crystXY/2.,
-                                  crystXY/2,
+                                  calorcellxy/2.,// former cystalXY now size of the calo chell 
+                                  calorcellxy/2,// former cystalXY now size of the calo chell 
                                   detThick/2.);
 
   fLogicFrontDet = new G4LogicalVolume(solidVacStep,    //its solid
@@ -253,7 +255,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                         "logicCaloFrontDet");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,-(aluwraplength/2+detThick/2.)),    //its position 
+                    G4ThreeVector(0.,0., -calorcelllength/2+detThick/2),    //its position old 0.,0.,-(aluwraplength/2+detThick/2.)
                     fLogicFrontDet,            //its logical volume
                     "physCaloFrontDet",                 //its name
                     logicCaloCell,               //its mother //old fCaloCellLV
@@ -266,13 +268,19 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                           "VacStep4");       //its name
 
    new G4PVPlacement(0,                   //no rotation
-                        G4ThreeVector(0.,0.,(aluwrapthick+alairgaplength)/2),    //its position 
+                        G4ThreeVector(0.,0.,calorcelllength/2-detThick/2),    //its position old 0.,0.,(aluwrapthick+alairgaplength)/2
                         fLogicBackDet,            //its logical volume
                         "VacStep4",                 //its name
-                        logicAluWrap,               //its mother //old fCaloCellLV
+                        logicCaloCell,               //its mother //old logicAluWrap
                         false,                     //no boolean operat
                         0);                        //copy number
 
+  G4VisAttributes * DetVis= new G4VisAttributes( G4Colour(242/255. ,142/255. ,0/255. ));
+  DetVis->SetVisibility(true);
+  DetVis->SetLineWidth(2);
+  DetVis->SetForceSolid(true);
+  fLogicBackDet->SetVisAttributes(DetVis);                     
+  fLogicFrontDet->SetVisAttributes(DetVis);  
   //---------------------------------------------------------------
   // If the full calorimeter is simulated -> also build housing    
   //---------------------------------------------------------------
@@ -392,6 +400,19 @@ void Calorimeter::ConstructCalorimeterSD(){
           G4SDManager::GetSDMpointer()->AddNewDetector(sdIC);
           // Retrieve the logical volume for this layer and set its SD
           fLogicFrontDet->SetSensitiveDetector(sdIC );
+      }
+  }
+  if (fConfig.GetConfigValueAsInt("Calorimeter","backDetector")){
+    std::string ntupleName = "behindCalo";
+    auto& mapping = fAnaConfigManager.GetNtupleNameToIdMap();
+    auto it = mapping.find(ntupleName);
+      if (it != mapping.end()) {
+          int ID = it->second;
+          G4cout << "--------0000000000000----------- ::: THE TUPLE ID IS:" << ID << G4endl;
+          auto sdBC = new CaloFrontSensitiveDetector(ntupleName, ntupleName, ID, fAnaConfigManager);
+          G4SDManager::GetSDMpointer()->AddNewDetector(sdBC);
+          // Retrieve the logical volume for this layer and set its SD
+          fLogicBackDet->SetSensitiveDetector(sdBC);
       }
   }
   if (fConfig.GetConfigValueAsInt("Calorimeter","crystDetector")){

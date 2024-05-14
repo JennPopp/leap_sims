@@ -46,7 +46,7 @@ void EventAction::BeginOfEventAction(const G4Event*) {
 
         if (mySD) {
             G4cout << "Reset: " << treeInfo.name << G4endl;
-            if (treeInfo.name == "inFrontCalo"){
+            if (treeInfo.name == "inFrontCalo" || treeInfo.name == "behindCalo"){
                 CaloFrontSensitiveDetector* specSD = dynamic_cast<CaloFrontSensitiveDetector*>(mySD);
                 specSD->Reset();
             }else if (treeInfo.name == "CaloCrystal"){
@@ -67,7 +67,7 @@ void EventAction::EndOfEventAction(const G4Event*) {
         G4SDManager* sdManager = G4SDManager::GetSDMpointer();
         
         for (const auto& treeInfo : fTreesInfo) {
-            if (treeInfo.name == "inFrontCalo"){
+            if (treeInfo.name == "inFrontCalo" || treeInfo.name == "behindCalo"){
                 CaloFrontSensitiveDetector* mySD = static_cast<CaloFrontSensitiveDetector*>(sdManager->FindSensitiveDetector(treeInfo.name));
                 if (!mySD) continue;
                 std::vector<double> energySum = mySD->GetEnergySum();
@@ -103,6 +103,7 @@ void EventAction::EndOfEventAction(const G4Event*) {
             CaloCrystalSD* mySD = static_cast<CaloCrystalSD*>(sdManager->FindSensitiveDetector(treeInfo.name));
             if (!mySD) continue;
             std::vector<double> Edep = mySD->GetEdepTot();
+            //G4cout << "EdepSUM: " << Edep[0] << G4endl;
             fAnaConfigManager.FillCaloCrystNtuple_summary(mySD->GetTupleID(), Edep);
 
         }

@@ -159,12 +159,12 @@ std::vector<TreeInfo> ConfigReader::ReadTreesInfo() const {
             G4int treeID = solenoidStatus*(ICdet+bCDet)+CFdet;
             trees.push_back(TreeInfo("CaloCrystal", "CaloCrystal", treeID));
         }
-        // CBdet = GetConfigValueAsInt("Calorimeter","backDetector");
-        // G4cout << "The detector at the back of the Calorimeter has status "<< CBdet << G4endl;
-        // if(CBdet){
-        //     G4int treeID = solenoidStatus*(ICdet+bCDet)+CFdet+CCdet;
-        //     trees.push_back(TreeInfo("behindCalo", "behindCalo", treeID));
-        // }
+        CBdet = GetConfigValueAsInt("Calorimeter","backDetector");
+        G4cout << "The detector at the back of the Calorimeter has status "<< CBdet << G4endl;
+        if(CBdet){
+            G4int treeID = solenoidStatus*(ICdet+bCDet)+CFdet+CCdet;
+            trees.push_back(TreeInfo("behindCalo", "behindCalo", treeID));
+        }
     }
     G4cout << "trees size: " << trees.size() << G4endl;
     return trees;
@@ -228,11 +228,11 @@ std::vector<BranchInfo> ConfigReader::GetBranchesInfo(const std::string& treeNam
             {"ParentID", "D"},
             {"EventID", "D"}
         };
-        if (treeName == "inFrontCalo"){
+        if (treeName == "inFrontCalo" || treeName =="behindCalo" ){
             branches.push_back({"crystNo","I"});
         }
     }else{ // use summary mode
-        if (treeName == "inFrontCalo"){
+        if (treeName == "inFrontCalo" || treeName == "behindCalo"){
             branches = {
                 {"Esum_0","D"},
                 {"Esum_1","D"},

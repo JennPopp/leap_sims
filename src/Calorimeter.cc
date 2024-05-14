@@ -47,6 +47,8 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
     //---------------------------------------------------------------
     G4double crystThick = 45.*cm; // length of the lead glass crystals
     G4double crystXY = 3.8*cm; // width in x/y of crystals
+    // G4double crystThick = 200.*cm; // length of the lead glass crystals
+    // G4double crystXY = 200*cm; // width in x/y of crystals
     G4double detThick = 1.0*mm; // thickness of virtual detectors 
 
     G4double alairgapthick = 0.001 *mm;   // thickness of the air gap between

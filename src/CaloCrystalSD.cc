@@ -22,6 +22,8 @@ CaloCrystalSD::~CaloCrystalSD() {}
 G4bool CaloCrystalSD::ProcessHits(G4Step* step, G4TouchableHistory* history) {
     // Common data processing logic, using layerIdentifier for differentiation   
     auto touchable = step->GetPreStepPoint()->GetTouchable();
+    // G4cout << " Edep in this step " << step->GetTotalEnergyDeposit()<< G4endl;
+    // G4cout << "name of the prestepvolume"<< step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName()<< G4endl;
     if (fShowerDevStat) {
         fAnaConfigManager.FillCaloCrystNtuple_detailed(fTupleID, touchable, step);
     } else { // outputmode == summary as default 

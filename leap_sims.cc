@@ -29,6 +29,11 @@
 #include "DetectorConstruction.hh"
 #include "ConfigReader.hh"
 #include "PhysicsList.hh"
+// stuff Felix edded 
+#include "FTFP_BERT.hh" // some standart physics list
+#include "G4PhysListFactory.hh"
+#include "G4VModularPhysicsList.hh"
+//~~~~~~~~~~~~~~~~~~~~~~~~
 #include "RunAction.hh"
 #include "EventAction.hh"
 #include "MacroGenerator.hh"
@@ -102,8 +107,13 @@ int main(int argc,char** argv)
   DetectorConstruction* detector = new DetectorConstruction(config, ana);
   runManager->SetUserInitialization(detector);
 
-  PhysicsList* physList = new PhysicsList(config);
+  PhysicsList* physList = new PhysicsList(config); 
+  //G4VModularPhysicsList* physList = new FTFP_BERT_EMV; // test other pysics lists 
+  // G4PhysListFactory physListFactory;
+  // G4VModularPhysicsList* physList = physListFactory.GetReferencePhysList("FTFP_BERT_EMV");
+
   runManager->SetUserInitialization(physList);
+  
 
   // Set user action class
   runManager->SetUserAction(new GpsPrimaryGeneratorAction());

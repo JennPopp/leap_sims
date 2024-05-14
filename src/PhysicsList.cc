@@ -4,8 +4,8 @@
 #include "PhysicsList.hh"
 #include "PhysListEmPolarized.hh"
 #include "PhysListOptical.hh"
-
 #include "G4EmStandardPhysics.hh"
+#include "G4EmStandardPhysics_option4.hh"
 #include "G4EmParameters.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -23,6 +23,7 @@ PhysicsList::PhysicsList(const ConfigReader& config)
     fEmPhysicsList = new PhysListEmPolarized();
   }else{
     fEmPhysicsList = new G4EmStandardPhysics();
+    // fEmPhysicsList = new G4EmStandardPhysics_option4();
   }
   
   fOptPhysicsList= new PhysListOptical();

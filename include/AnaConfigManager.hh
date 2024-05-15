@@ -29,7 +29,8 @@ class AnaConfigManager {
                                     const std::vector<double> Esum) const;
     void FillCaloCrystNtuple_detailed(int tupleID,const G4VTouchable* history, G4Step* step) const;
     void FillCaloCrystNtuple_summary(int tupleID,
-                                    const std::vector<double> Edep) const;
+                                    const std::vector<double> Edep,
+                                    const std::vector<double> Tlength) const;
     void SetupMetadataTTree();
 
     //getter methods 

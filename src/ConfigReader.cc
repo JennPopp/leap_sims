@@ -201,7 +201,17 @@ std::vector<BranchInfo> ConfigReader::GetBranchesInfo(const std::string& treeNam
                 {"Edep_5","D"},
                 {"Edep_6","D"},
                 {"Edep_7","D"},
-                {"Edep_8","D"}
+                {"Edep_8","D"},
+                {"Tlength_0","D"},
+                {"Tlength_1","D"},
+                {"Tlength_2","D"},
+                {"Tlength_3","D"},
+                {"Tlength_4","D"},
+                {"Tlength_5","D"},
+                {"Tlength_6","D"},
+                {"Tlength_7","D"},
+                {"Tlength_8","D"},
+
                 };
             }
             return branches ;

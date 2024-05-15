@@ -103,8 +103,9 @@ void EventAction::EndOfEventAction(const G4Event*) {
             CaloCrystalSD* mySD = static_cast<CaloCrystalSD*>(sdManager->FindSensitiveDetector(treeInfo.name));
             if (!mySD) continue;
             std::vector<double> Edep = mySD->GetEdepTot();
+            std::vector<double> Tlength = mySD->GetTlengthTot();
             //G4cout << "EdepSUM: " << Edep[0] << G4endl;
-            fAnaConfigManager.FillCaloCrystNtuple_summary(mySD->GetTupleID(), Edep);
+            fAnaConfigManager.FillCaloCrystNtuple_summary(mySD->GetTupleID(), Edep, Tlength);
 
         }
     }

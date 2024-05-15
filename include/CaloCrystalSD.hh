@@ -14,6 +14,7 @@ public:
 
     // Getter methods
     std::vector<double> GetEdepTot() const {return fEdepTot;}
+    std::vector<double> GetTlengthTot() const {return fTlengthTot;}
     int GetTupleID() const {return fTupleID;}
 
     // method to reset the member variables 
@@ -22,6 +23,7 @@ public:
 private:
     // Member variables initialization
     std::vector<double> fEdepTot;
+    std::vector<double> fTlengthTot;
 
     // Additional private members
     const std::string fLayerIdentifier;

@@ -185,13 +185,13 @@ void AnaConfigManager::FillCaloFrontTuple_summary(int tupleID,
 
 void AnaConfigManager::FillCaloCrystNtuple_summary(int tupleID,
                                                     const std::vector<double> Edep,
-                                                    const std::vector<double> Tlength) const {
+                                                    const std::vector<double> Edep_ct) const {
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     for (int i = 0; i < 9; ++i) {
         analysisManager->FillNtupleDColumn(tupleID, i, Edep[i]);
     }
     for (int i = 0; i < 9; ++i) {
-        analysisManager->FillNtupleDColumn(tupleID, 9+i, Tlength[i]);
+        analysisManager->FillNtupleDColumn(tupleID, 9+i, Edep_ct[i]);
     }
     analysisManager->AddNtupleRow(tupleID);
 }

@@ -201,7 +201,16 @@ std::vector<BranchInfo> ConfigReader::GetBranchesInfo(const std::string& treeNam
                 {"Edep_5","D"},
                 {"Edep_6","D"},
                 {"Edep_7","D"},
-                {"Edep_8","D"}
+                {"Edep_8","D"},
+                {"Edep_ct_0","D"},
+                {"Edep_ct_1","D"},
+                {"Edep_ct_2","D"},
+                {"Edep_ct_3","D"},
+                {"Edep_ct_4","D"},
+                {"Edep_ct_5","D"},
+                {"Edep_ct_6","D"},
+                {"Edep_ct_7","D"},
+                {"Edep_ct_8","D"}
                 };
             }
             return branches ;
@@ -283,5 +292,18 @@ std::string ConfigReader::ReadOutputFileName() const {
             G4cout<< "No output file name was found in the config file, use default."<< G4endl;
         }
     return "result"; // default value
+    
+}
+
+G4double ConfigReader::ReadEinLim() const {
+    try {
+            G4double EinLim = GetConfigValueAsDouble("Calorimeter", "EinLimit");
+            if (EinLim) {
+                return EinLim;
+            }
+        } catch (const std::exception& e) {
+            G4cout<< "No energy limit was given -> Set to 0 "<< G4endl;
+        }
+    return 0; // default value
     
 }

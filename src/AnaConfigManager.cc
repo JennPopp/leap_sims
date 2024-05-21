@@ -11,6 +11,7 @@ AnaConfigManager::AnaConfigManager(const ConfigReader& config)
     fOutputMode(config.ReadOutputMode()),
     fOutputFileName(config.ReadOutputFileName()),
     fTreesInfo(config.ReadTreesInfo()),
+    fEinLim(config.ReadEinLim()),
     fShowerDevStat(config.ReadShowerDevStat()) {
     
     G4cout << "\n----> The output mode is " << fOutputMode << "\n" << G4endl;
@@ -184,10 +185,14 @@ void AnaConfigManager::FillCaloFrontTuple_summary(int tupleID,
 
 
 void AnaConfigManager::FillCaloCrystNtuple_summary(int tupleID,
-                                                    const std::vector<double> Edep) const {
+                                                    const std::vector<double> Edep,
+                                                    const std::vector<double> Edep_ct) const {
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     for (int i = 0; i < 9; ++i) {
         analysisManager->FillNtupleDColumn(tupleID, i, Edep[i]);
+    }
+    for (int i = 0; i < 9; ++i) {
+        analysisManager->FillNtupleDColumn(tupleID, 9+i, Edep_ct[i]);
     }
     analysisManager->AddNtupleRow(tupleID);
 }

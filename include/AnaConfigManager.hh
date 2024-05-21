@@ -29,7 +29,8 @@ class AnaConfigManager {
                                     const std::vector<double> Esum) const;
     void FillCaloCrystNtuple_detailed(int tupleID,const G4VTouchable* history, G4Step* step) const;
     void FillCaloCrystNtuple_summary(int tupleID,
-                                    const std::vector<double> Edep) const;
+                                    const std::vector<double> Edep,
+                                    const std::vector<double> Tlength) const;
     void SetupMetadataTTree();
 
     //getter methods 
@@ -49,10 +50,15 @@ class AnaConfigManager {
         return fShowerDevStat;
     }
 
+    const G4double GetEinLim() const{
+        return fEinLim;
+    }
+
     private:
     // using the convention of putting an f in front of member variables 
     const ConfigReader& fConfig;
     const std::string fOutputMode;
+    const G4double fEinLim;
     const std::string fOutputFileName;
     const int fShowerDevStat;
     const std::vector<TreeInfo> fTreesInfo; // tree info is structure with name, title and id

@@ -24,7 +24,8 @@ private:
     // Member variables initialization
     std::vector<double> fEnergySum;
     std::vector<int> fNtot;
-
+    G4double fEinLim;
+    G4double fEin_tot;
     // Additional private members
     const std::string fLayerIdentifier;
     int fTupleID;

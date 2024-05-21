@@ -294,3 +294,16 @@ std::string ConfigReader::ReadOutputFileName() const {
     return "result"; // default value
     
 }
+
+G4double ConfigReader::ReadEinLim() const {
+    try {
+            G4double EinLim = GetConfigValueAsDouble("Calorimeter", "EinLimit");
+            if (EinLim) {
+                return EinLim;
+            }
+        } catch (const std::exception& e) {
+            G4cout<< "No energy limit was given -> Set to 0 "<< G4endl;
+        }
+    return 0; // default value
+    
+}

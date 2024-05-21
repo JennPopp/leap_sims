@@ -31,6 +31,7 @@ public:
     G4ThreeVector GetConfigValueAsG4ThreeVector(const std::string& section, const std::string& key) const;
     int GetConfigValueAsInt(const std::string& section, const std::string& key) const;
     std::string ReadOutputMode()  const;
+    G4double ReadEinLim() const;
     const std::map<std::string, std::map<std::string, std::string>>& GetConfigValues() const;
     std::string ReadOutputFileName() const;
     int ReadShowerDevStat() const;

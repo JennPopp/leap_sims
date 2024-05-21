@@ -11,6 +11,7 @@ AnaConfigManager::AnaConfigManager(const ConfigReader& config)
     fOutputMode(config.ReadOutputMode()),
     fOutputFileName(config.ReadOutputFileName()),
     fTreesInfo(config.ReadTreesInfo()),
+    fEinLim(config.ReadEinLim()),
     fShowerDevStat(config.ReadShowerDevStat()) {
     
     G4cout << "\n----> The output mode is " << fOutputMode << "\n" << G4endl;

@@ -11,8 +11,10 @@ CaloFrontSensitiveDetector::CaloFrontSensitiveDetector(const G4String& name, con
       fTupleID(tupleID),
       fAnaConfigManager(anaConfigManager),
       fOutputMode(anaConfigManager.GetOutputMode()),
+      fEinLim(anaConfigManager.GetEinLim()),
       fEnergySum(9),
-      fNtot(9)
+      fNtot(9),
+      fEin_tot(0.)
 
 {
     G4cout << "Constructing CaloFrontSensitiveDetector. Address: " << this << ", Size: " << fEnergySum.size() << G4endl;
@@ -21,11 +23,24 @@ CaloFrontSensitiveDetector::CaloFrontSensitiveDetector(const G4String& name, con
 CaloFrontSensitiveDetector::~CaloFrontSensitiveDetector() {}
 
 G4bool CaloFrontSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* history) {
+
+    // Add some 
     //G4cout << "ProcessHits called for volume: " << step->GetPreStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
     // Common data processing logic, using layerIdentifier for differentiation
     //G4cout << "ProcessHits called: Momentum direction" << step->GetPostStepPoint()->GetMomentumDirection().z() << G4endl;
     if (step->GetPreStepPoint()->GetMomentumDirection().z() > 0 ){
-        
+        // definde the if condition to check the total energy is reached.
+        G4double Estep = step->GetPostStepPoint()->GetTotalEnergy()/MeV;
+        fEin_tot += Estep;
+        // G4cout << "ElLimit: " << fEinLim<< G4endl;
+        // G4cout << "Ein_total" << fEin_tot<< G4endl;
+        if (fEinLim != 0.) {
+            if (fEin_tot >= fEinLim){
+                G4cout << "Total Energy of " << fEin_tot << " MeV has been reached -> event stopped" << G4endl;
+                G4RunManager::GetRunManager()->AbortEvent();
+            }
+        }
+
         if (fOutputMode == "detailed") {
             auto touchable = step->GetPreStepPoint()->GetTouchable();
             fAnaConfigManager.FillCaloFrontTuple_detailed(fTupleID, touchable, step);
@@ -53,4 +68,5 @@ G4bool CaloFrontSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*
 void CaloFrontSensitiveDetector::Reset() {
     std::fill(fEnergySum.begin(),fEnergySum.end(),0.0);
     std::fill(fNtot.begin(),fNtot.end(),0); 
+    fEin_tot = 0.;
 }

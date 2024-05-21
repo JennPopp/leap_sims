@@ -58,8 +58,20 @@ void EventAction::BeginOfEventAction(const G4Event*) {
             }
         }
     }
-}
-  
+    }else if(fOutputMode == "detailed"){
+        for (const auto& treeInfo : fTreesInfo) {
+            G4VSensitiveDetector* mySD = sdManager->FindSensitiveDetector(treeInfo.name);
+
+            if (mySD) {
+                G4cout << "Reset: " << treeInfo.name << G4endl;
+                if (treeInfo.name == "CaloCrystal"){
+                    CaloCrystalSD* specSD = dynamic_cast<CaloCrystalSD*>(mySD);
+                    specSD->Reset();
+                }
+            }
+        }
+    }
+    
 }
 
 void EventAction::EndOfEventAction(const G4Event*) {

@@ -50,12 +50,19 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     std::string posType = config.GetConfigValue("GPS","posType");
     std::string spotSize = config.GetConfigValue("GPS","spotSize");
 
-    macroFile << "/gps/pos/type " << posType  <<std::endl;
+    //macroFile << "/gps/pos/type " << posType  <<std::endl;
 
-    if (posType == "Volume"){
+    if (posType == "Plane"){
+        macroFile << "/gps/pos/type " << posType  <<std::endl;
         macroFile << "/gps/pos/shape Circle" << std::endl;
         macroFile << "/gps/pos/radius " << spotSize << " mm" << std::endl;
-    }else{
+    } else if (posType == "Square") {
+        macroFile << "/gps/pos/type " << "Plane"  <<std::endl;
+        macroFile << "/gps/pos/shape Square" << std::endl;
+        macroFile << "/gps/pos/halfx " << spotSize << " mm" << std::endl;
+        macroFile << "/gps/pos/halfy " << spotSize << " mm" << std::endl;
+    } else{
+        macroFile << "/gps/pos/type " << posType  <<std::endl;
         macroFile << "/gps/pos/sigma_x "<< spotSize << " mm" << std::endl;
         macroFile << "/gps/pos/sigma_y "<< spotSize << " mm" << std::endl;
     }

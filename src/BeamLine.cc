@@ -47,7 +47,7 @@ G4LogicalVolume* BeamLine::ConstructBeamLine(){
         // Geometry Parameters-----------------------------------------------
         G4double dist_to_calo = 956*m;
         G4double PlaineHight = 5.00 *cm;
-        G4double PlaineThick = 0.5 *mm;
+        G4double PlaineThick = 0.05 *mm; // Telescope planes are 5mum silicon planes (asked Marcel 21.05.2024)
         G4double Nplanes = 6;
         G4double SFthick = 10 *mm ;
         G4double SFhight= 20 *mm;

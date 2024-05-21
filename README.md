@@ -26,7 +26,7 @@
   - available output modes are `summary` and `detailed`
   - `polDeg` spezifies the $\xi_3$, longitudinal polarization, of either the material (`[Solenoid]`) , or the initial bema electron (`[GPS]`)
   - `nBunch` is the number of particles that are shot during one event
-  - `posType` is by default set to `Beam`, which causes a 2d gaussian profile, but can also be set to `Volume` in order to use a pencil beam
+  - `posType` is by default set to `Beam`, which causes a 2d gaussian profile, but can also be set to `Plane` in order to use a pencil beam disc shape or to `Square` to have a squared shaped constant beam pofile 
   - `spotSize` is equal to the $\sigma$ in x and y if the type is set to beam, otherwhise its the radius of the beam
   - `eneType` can be set to `Gauss`, where `sigmaE` can be set to zero to achieve a monoenergetic beam, or to `User`
   - in the latter case a histogram name `histname` has to be specified

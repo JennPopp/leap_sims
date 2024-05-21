@@ -85,7 +85,7 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
         macroFile << "/gps/energy " << energy << " MeV "<< std::endl;
 
         std::string sigmaE = config.GetConfigValue("GPS","sigmaE");
-        macroFile << "/gps/ene/sigma " << sigmaE << std::endl; 
+        macroFile << "/gps/ene/sigma " << sigmaE << " MeV "<< std::endl; 
 
     }else if (eneType == "User"){
         macroFile << "/gps/hist/type energy" << std::endl;

@@ -21,7 +21,7 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     int rndsd2 = config.GetConfigValueAsInt("RandomSeeds","rndsds2");
     macroFile << "/random/setSeeds " << rndsd1 << " " << rndsd2 << std::endl; 
     
-    macroFile << "/run/printProgress 1" << std::endl; 
+    macroFile << "/run/printProgress 100" << std::endl; 
     macroFile << "/run/initialize" << std::endl; 
 
     // polarization manager, only callable ofter initialization -----------------------------------
@@ -82,7 +82,8 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     if (eneType == "Gauss"){
         
         energy = config.GetConfigValue("GPS", "energy");
-        macroFile << "/gps/energy " << energy << " MeV "<< std::endl;
+        //macroFile << "/gps/energy " << energy << " MeV "<< std::endl;
+        macroFile << "/gps/ene/mono " << energy << " MeV "<< std::endl;
 
         std::string sigmaE = config.GetConfigValue("GPS","sigmaE");
         macroFile << "/gps/ene/sigma " << sigmaE << " MeV "<< std::endl; 

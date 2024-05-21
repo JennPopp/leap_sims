@@ -45,7 +45,7 @@ void EventAction::BeginOfEventAction(const G4Event*) {
         G4VSensitiveDetector* mySD = sdManager->FindSensitiveDetector(treeInfo.name);
 
         if (mySD) {
-            G4cout << "Reset: " << treeInfo.name << G4endl;
+            //G4cout << "Reset: " << treeInfo.name << G4endl;
             if (treeInfo.name == "inFrontCalo" || treeInfo.name == "behindCalo"){
                 CaloFrontSensitiveDetector* specSD = dynamic_cast<CaloFrontSensitiveDetector*>(mySD);
                 specSD->Reset();
@@ -63,7 +63,7 @@ void EventAction::BeginOfEventAction(const G4Event*) {
             G4VSensitiveDetector* mySD = sdManager->FindSensitiveDetector(treeInfo.name);
 
             if (mySD) {
-                G4cout << "Reset: " << treeInfo.name << G4endl;
+                //G4cout << "Reset: " << treeInfo.name << G4endl;
                 if (treeInfo.name == "CaloCrystal"){
                     CaloCrystalSD* specSD = dynamic_cast<CaloCrystalSD*>(mySD);
                     specSD->Reset();
@@ -110,7 +110,7 @@ void EventAction::EndOfEventAction(const G4Event*) {
         }
     }
     for (const auto& treeInfo : fTreesInfo) {
-        if(treeInfo.name == "CaloCrystal") {
+        if(treeInfo.name == "CaloCrystal" && (fOutputMode == "summary" || fOutputMode == "detailed")) {
             G4SDManager* sdManager = G4SDManager::GetSDMpointer();
             CaloCrystalSD* mySD = static_cast<CaloCrystalSD*>(sdManager->FindSensitiveDetector(treeInfo.name));
             if (!mySD) continue;

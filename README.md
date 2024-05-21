@@ -23,7 +23,7 @@
   - if the full calorimeter is used, always 9 crystals are placed, otherwhise either 9 o 1 are possible
   - distances are in mm, energies in MeV
   - `beamLineStatus 1` uses the experimental setup used at FLARE, `beamLineStatus 2` uses the testbeam setup
-  - available output modes are `summary` and `detailed`
+  - available output modes are `summary`, `SumRun` and `detailed`. `summary` sums up after every event. `SumRun` sums up the run. 
   - `polDeg` spezifies the $\xi_3$, longitudinal polarization, of either the material (`[Solenoid]`) , or the initial bema electron (`[GPS]`)
   - `nBunch` is the number of particles that are shot during one event
   - `posType` is by default set to `Beam`, which causes a 2d gaussian profile, but can also be set to `Plane` in order to use a pencil beam disc shape or to `Square` to have a squared shaped constant beam pofile 

@@ -2,7 +2,11 @@
 #include "RunAction.hh"
 #include "AnaConfigManager.hh"
 #include "G4AnalysisManager.hh"
-
+#include "G4SDManager.hh"
+#include <vector>
+#include "BaseSensitiveDetector.hh" // Include your sensitive detector header
+#include "CaloFrontSensitiveDetector.hh"
+#include "CaloCrystalSD.hh"
 #include <iostream>
 
 // ANSI escape code for red text
@@ -47,6 +51,49 @@ void RunAction::EndOfRunAction(const G4Run* run) {
     // don't execute if there have been no events 
     G4int NbOfEvents = run->GetNumberOfEvent();
     if (NbOfEvents == 0) return;
+
+    //Run Summary 
+     if (fOutputMode == "SumRun") {
+        G4SDManager* sdManager = G4SDManager::GetSDMpointer();
+        
+        for (const auto& treeInfo : fTreesInfo) {
+            if (treeInfo.name == "inFrontCalo" || treeInfo.name == "behindCalo"){
+                CaloFrontSensitiveDetector* mySD = static_cast<CaloFrontSensitiveDetector*>(sdManager->FindSensitiveDetector(treeInfo.name));
+                if (!mySD) continue;
+                std::vector<double> energySum = mySD->GetEnergySum();
+                std::vector<int> Ntot = mySD->GetTotalCount();
+                //G4cout << "CaloFrontSensitiveDetector Address in EventAction: " << mySD << ", Size: " << energySum.size() << G4endl;
+                //G4cout << "-------ooooooooooooo-----------ooooooooooooooooooo---------ooooooooooooooo----- energySum has length " << energySum.size() << G4endl;
+                fAnaConfigManager.FillCaloFrontTuple_summary(mySD->GetTupleID(), Ntot, energySum);
+
+            } else if (treeInfo.name == "CaloCrystal" ){
+                G4SDManager* sdManager = G4SDManager::GetSDMpointer();
+                CaloCrystalSD* mySD = static_cast<CaloCrystalSD*>(sdManager->FindSensitiveDetector(treeInfo.name));
+                if (!mySD) continue;
+                std::vector<double> Edep = mySD->GetEdepTot();
+                std::vector<double> Edep_ct= mySD->GetEdepTot_ct();
+                //G4cout << "EdepSUM: " << Edep[0] << G4endl;
+                fAnaConfigManager.FillCaloCrystNtuple_summary(mySD->GetTupleID(), Edep, Edep_ct);
+            }else{
+                BaseSensitiveDetector* mySD = static_cast<BaseSensitiveDetector*>(sdManager->FindSensitiveDetector(treeInfo.name));
+                if (!mySD) continue;
+
+                G4double energySum = mySD->GetEnergySum();
+                G4int Ntot = mySD->GetTotalCount();
+                G4double EgammaSum = mySD->GetGammaEnergySum();
+                G4int Ngamma = mySD->GetGammaCount();
+                G4double EeSum = mySD->GetElectronEnergySum();
+                G4int Ne = mySD->GetElectronCount();
+
+                // These vectors are automatically passed by const reference due to the function signature
+                std::vector<int> particleCounts = {Ntot, Ngamma, Ne};
+                std::vector<G4double> energySums = {energySum, EgammaSum, EeSum};
+
+                fAnaConfigManager.FillBaseNtuple_summary(mySD->GetTupleID(), particleCounts, energySums);
+            }
+        }
+    }
+
 
     // show Rndm status
     //CLHEP::HepRandom::showEngineStatus();

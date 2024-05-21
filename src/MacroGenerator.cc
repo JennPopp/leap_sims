@@ -31,7 +31,7 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
         macroFile << "/polarization/volume/list" << std::endl;
     }
     
-    // test the step sice stuff--------------------------------------------------------------------
+    // test the step size stuff--------------------------------------------------------------------
     // macroFile <<"/testem/stepMax" << " 0.1 mm" << std::endl;
     // test energy cutoff 
     // macroFile <<"/process/em/lowestElectronEnergy" << " 8 MeV" << std::endl;
@@ -49,8 +49,6 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
 
     std::string posType = config.GetConfigValue("GPS","posType");
     std::string spotSize = config.GetConfigValue("GPS","spotSize");
-
-    //macroFile << "/gps/pos/type " << posType  <<std::endl;
 
     if (posType == "Plane"){
         macroFile << "/gps/pos/type " << posType  <<std::endl;

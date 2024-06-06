@@ -96,8 +96,15 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     std::string Nevents = config.GetConfigValue("Run","Nevents");
     std::string polDeg = config.GetConfigValue("GPS","polDeg"); 
     std::string Bz = config.GetConfigValue("Solenoid","Bz");
+    double polDegSol = config.GetConfigValueAsDouble("Solenoid","polDeg");
+    std::string flip = config.GetConfigValue("Run","flip");
+    auto Bstat = config.GetConfigValueAsInt("Solenoid","BField");
+    // if runType is asymmetry two runs are started, if runtype is single just one run is started
+    // if flip == source the polarization of the electrons is flipped 
+    // if flip == core the polarization of core and B-Field is flipped
+    
 
-    if (runType=="asymmetry" && polDeg!="0"){
+    if (runType=="asymmetry" && flip=="source"){
         // one run in each polarization direction !----------------------------------------------------  
 
         macroFile << "/gps/polarization 0. 0. " << polDeg << std::endl;
@@ -108,15 +115,23 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
 
         macroFile << "/run/beamOn " << Nevents << std::endl;
 
-    } else if (runType=="asymmetry" && polDeg=="0"){
+    } else if (runType=="asymmetry" && flip=="core" && solenoidStatus==1 &&( Bstat==1 || polDegSol>0.0)){
         // one run with magnet and iron polarization in one direction and one in the other 
         
-        // for the first run the value spezified in the macro is used e.g. 2.2 T
+        // for the first run the value spezified in the init is used e.g. 2.2 T, same for pol degree 
         macroFile << "/run/beamOn " << Nevents << std::endl;
 
-        //Then the Bfield needs to be changed to the negative value 
-        macroFile << "/solenoid/setBz -" << Bz << " tesla" << std::endl;
+        //Then the Bfield and or the pol degree needs to be changed to the negative value 
+        if (Bstat){
+            macroFile << "/solenoid/setBz -" << Bz << " tesla" << std::endl;
+        }
+        
+        if (polDegSol>0.0){
+            macroFile << "/polarization/volume/set logicCore 0. 0. -"<< std::to_string(polDegSol) << std::endl;
+        }
         macroFile << "/run/beamOn " << Nevents << std::endl;
+        
+        
 
     } else {
         // single run with N events  

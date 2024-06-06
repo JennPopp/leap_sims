@@ -16,6 +16,12 @@
 4. edit the config.ini file to your needs
   - available run types are `asymmetry` (starts 2 runs with different polarization configurations) and `single` (starts a single run)
   - if run type `asymmetry` is chosen and the $\xi_3$ of the electron beam is 0 two runs with $\pm \xi_{3,Fe}$ and Bz are started, otherwhise $\xi_{3,Fe}$ stays constant and $\xi_{3,e^-}$ flips
+  - `polarizationStatus`: 
+  - **1**: Uses polarized EM physics.
+  - **-1**: Uses a very detailed unpolarized EM physics list.
+  - **0** or any other value: Standard EM physics list will be used.
+  - `opticalStatus`:
+  - **1**: Includes optical physics but is not implemented yet and therefore not recommended.
   - available world materials are `Air` and `Galactic`
   - available solenoid types are `TP1` (used for design study) and `TP2` (used for experiment)
   - to remove converter target simply set `convThick` to 0

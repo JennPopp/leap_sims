@@ -8,6 +8,10 @@
 #include "G4PVPlacement.hh"
 #include "G4Box.hh"
 #include "G4SystemOfUnits.hh"
+
+// #include "G4Region.hh"
+// #include "G4RegionStore.hh"
+// #include "G4UImanager.hh"
 namespace leap
 {
 
@@ -80,6 +84,22 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
   G4cout << ".....................................................................................................magThick is "<< magThick << G4endl;
   if (fConfig.GetConfigValueAsInt("Calorimeter","calorimeterStatus")){
     G4LogicalVolume* logicCalo = fCalo->ConstructCalo();
+
+
+    // // test for the region 
+    // G4Region* myRegion = new G4Region("Calo");
+    // G4RegionStore::GetInstance()->Register(myRegion);
+    // // Zuweisen des logischen Volumens zur Region
+    // myRegion->AddRootLogicalVolume(logicCalo);
+    // // Aktivieren elektromagnetischer Prozesse für die Region mit optionaler Konfiguration
+    // G4String emType = "G4EmStandard_opt4"; // Beispiel für den Typ des EM-Prozesses
+    // G4String regName = "Calo"; // Name der Region, für die der Prozess konfiguriert wird
+    // G4String command = "/process/em/AddEmRegion " + regName + " " + emType;
+    // G4String guidance = "Optional EM configuration for a G4Region.";
+    // G4String fullCommand = command + "\n# " + guidance;
+    // G4UImanager::GetUIpointer()->ApplyCommand(fullCommand);
+
+
     G4double caloLength = fCalo->GetVirtCaloLength();
     G4cout << ".....................................................................................................caloLength is "<< caloLength << G4endl;
     new G4PVPlacement(0,

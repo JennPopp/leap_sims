@@ -32,10 +32,14 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     }
     
     // test the step size stuff--------------------------------------------------------------------
-    // macroFile <<"/testem/stepMax" << " 0.1 mm" << std::endl;
+    //macroFile <<"/testem/stepMax" << " 0.1 mm" << std::endl;
     // test energy cutoff 
-    // macroFile <<"/process/em/lowestElectronEnergy" << " 8 MeV" << std::endl;
+    // macroFile <<"/process/em/lowestElectronEnergy" << " 100 eV" << std::endl; // this is the energy cutoff 
+    macroFile <<"/process/eLoss/StepFunction" << " 0.2 0.01 mm" << std::endl; // this is the step function which is important for the energy loss per step etc.
     // macroFile <<"/run/setCut"<< " 0.01 mm" << std::endl;
+    //macroFile << "/control/manual /process/em" << std::endl; // print all UI commands 
+    // macroFile << "/process/em/fluo" << " 1" << std::endl; // enable disbale fluo 
+
 
     // gps commands -------------------------------------------------------------------------------
     int nBunch = config.GetConfigValueAsInt("GPS","nBunch");

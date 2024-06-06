@@ -44,13 +44,20 @@
 #include "G4PolarizedGammaConversion.hh"
 #include "G4PolarizedIonisation.hh"
 #include "G4PolarizedPhotoElectric.hh"
-
+// #include "G4EmParameters.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PhysListEmPolarized::PhysListEmPolarized(const G4String& name)
    :  G4VPhysicsConstructor(name)
-{}
+{
+  // Setzen der EM-Parameter
+    // G4EmParameters* emParameters = G4EmParameters::Instance();
+    // emParameters->SetNumberOfBinsPerDecade(20);
+    // emParameters->SetMaxNIELEnergy(1*CLHEP::MeV);
+    // emParameters->SetMscRangeFactor(0.08);
+
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

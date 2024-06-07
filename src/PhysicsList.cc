@@ -21,9 +21,10 @@ PhysicsList::PhysicsList(const ConfigReader& config)
   SetVerboseLevel(1);
   if (fPolStatus==1){
     fEmPhysicsList = new PhysListEmPolarized();
+  }else if(fPolStatus==-1){
+    fEmPhysicsList = new G4EmStandardPhysics_option4();// this physics list is the most precise for EM physics but takes longer
   }else{
     fEmPhysicsList = new G4EmStandardPhysics();
-    // fEmPhysicsList = new G4EmStandardPhysics_option4();
   }
   
   fOptPhysicsList= new PhysListOptical();

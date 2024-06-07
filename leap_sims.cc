@@ -29,7 +29,7 @@
 #include "DetectorConstruction.hh"
 #include "ConfigReader.hh"
 #include "PhysicsList.hh"
-// stuff Felix edded 
+// stuff Felix added 
 #include "FTFP_BERT.hh" // some standart physics list
 #include "G4PhysListFactory.hh"
 #include "G4VModularPhysicsList.hh"

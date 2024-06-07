@@ -49,6 +49,7 @@ Solenoid::Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManage
     fPolDeg = config.GetConfigValueAsDouble("Solenoid","polDeg");
 
     fBz = config.GetConfigValueAsDouble("Solenoid","Bz");
+    
 }
 
 Solenoid::~Solenoid() {
@@ -406,8 +407,10 @@ void Solenoid::ConstructSolenoidSD() {
 }
 
 void Solenoid::ConstructSolenoidBfield(){
+  //G4cout << "Constructing solenoid magnetic field with Bz = " << fBz << " tesla" << G4endl;
+
   // define the magnetic field (start with uniform:))
-  G4UniformMagField* solenoidMagneticField = new G4UniformMagField(G4ThreeVector(0., 0., fBz*tesla));
+  G4UniformMagField* solenoidMagneticField = new G4UniformMagField(G4ThreeVector(0., 0., fBz));
 
   // Create a field manager and set the magnetic field
   G4FieldManager* fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
@@ -422,4 +425,5 @@ void Solenoid::ConstructSolenoidBfield(){
 
 void Solenoid::SetBz(G4double newBz) {
     fBz = newBz;
+    ConstructSolenoidBfield();
 }

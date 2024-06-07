@@ -21,7 +21,7 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     int rndsd2 = config.GetConfigValueAsInt("RandomSeeds","rndsds2");
     macroFile << "/random/setSeeds " << rndsd1 << " " << rndsd2 << std::endl; 
     
-    macroFile << "/run/printProgress 100" << std::endl; 
+    macroFile << "/run/printProgress 1000" << std::endl; 
     macroFile << "/run/initialize" << std::endl; 
 
     // polarization manager, only callable ofter initialization -----------------------------------
@@ -30,7 +30,10 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
         macroFile << "/polarization/manager/verbose 1" << std::endl;
         macroFile << "/polarization/volume/list" << std::endl;
     }
-    
+    // print the registered magnetic fields -----------------------------------------------------
+    macroFile << "/solenoid/listMagneticFields"<<std::endl;
+
+
     // change final range of electron loss function to 0.01--------------------------------------------------------------------
     macroFile <<"/process/eLoss/StepFunction" << " 0.2 0.01 mm" << std::endl;
 
@@ -94,7 +97,7 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
 
     std::string runType = config.GetConfigValue("Run","type");
     std::string Nevents = config.GetConfigValue("Run","Nevents");
-    std::string polDeg = config.GetConfigValue("GPS","polDeg"); 
+    double polDeg = config.GetConfigValueAsDouble("GPS","polDeg"); 
     std::string Bz = config.GetConfigValue("Solenoid","Bz");
     double polDegSol = config.GetConfigValueAsDouble("Solenoid","polDeg");
     std::string flip = config.GetConfigValue("Run","flip");
@@ -107,23 +110,28 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
     if (runType=="asymmetry" && flip=="source"){
         // one run in each polarization direction !----------------------------------------------------  
 
-        macroFile << "/gps/polarization 0. 0. " << polDeg << std::endl;
+        macroFile << "/gps/polarization 0. 0. " << std::to_string(polDeg) << std::endl;
 
         macroFile << "/run/beamOn " << Nevents << std::endl;
 
-        macroFile << "/gps/polarization 0. 0. -" << polDeg << std::endl;
+        macroFile << "/gps/polarization 0. 0. -" << std::to_string(polDeg) << std::endl;
 
         macroFile << "/run/beamOn " << Nevents << std::endl;
 
     } else if (runType=="asymmetry" && flip=="core" && solenoidStatus==1 &&( Bstat==1 || polDegSol>0.0)){
         // one run with magnet and iron polarization in one direction and one in the other 
         
+        if (polDeg != 0){
+            macroFile << "/gps/polarization 0. 0. " << std::to_string(polDeg) << std::endl;
+        }
+
         // for the first run the value spezified in the init is used e.g. 2.2 T, same for pol degree 
         macroFile << "/run/beamOn " << Nevents << std::endl;
 
         //Then the Bfield and or the pol degree needs to be changed to the negative value 
         if (Bstat){
             macroFile << "/solenoid/setBz -" << Bz << " tesla" << std::endl;
+            macroFile << "/solenoid/listMagneticFields"<<std::endl;
         }
         
         if (polDegSol>0.0){

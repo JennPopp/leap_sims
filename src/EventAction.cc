@@ -24,22 +24,6 @@ EventAction::~EventAction() {
 void EventAction::BeginOfEventAction(const G4Event*) {
     G4SDManager* sdManager = G4SDManager::GetSDMpointer();
 
-    // if(fOutputMode == "summary"){
-    //     for (const auto& treeInfo : fTreesInfo) {
-    //         if (treeInfo.name == "inFrontCalo"){
-    //             CaloFrontSensitiveDetector* mySD = static_cast<CaloFrontSensitiveDetector*>(sdManager->FindSensitiveDetector(treeInfo.name));
-    //         }else if (treeInfo.name == "CaloCrystal"){
-    //             CaloCrystalSD* mySD = static_cast<CaloCrystalSD*>(sdManager->FindSensitiveDetector(treeInfo.name));
-    //         }else{
-    //             BaseSensitiveDetector* mySD = static_cast<BaseSensitiveDetector*>(sdManager->FindSensitiveDetector(treeInfo.name));
-    //         }
-            
-    //         G4cout << "Reset: " << treeInfo.name<< G4endl;
-    //         if (mySD) {
-    //             mySD->Reset(); // Reset accumulated data for each sensitive detector
-    //         }
-    //     }
-    // }
     if(fOutputMode == "summary"){
     for (const auto& treeInfo : fTreesInfo) {
         G4VSensitiveDetector* mySD = sdManager->FindSensitiveDetector(treeInfo.name);

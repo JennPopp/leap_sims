@@ -170,6 +170,46 @@ std::vector<TreeInfo> ConfigReader::ReadTreesInfo() const {
     return trees;
 }
 
+std::vector<HistoInfo> ConfigReader::ReadHistoInfo() const {
+    // Logic to read histo configurations from fConfigValues
+
+    // declare the tree vector 
+    std::vector<HistoInfo> histos;
+
+    // check all the geometry and detector states 
+    // for now just Solenoid 
+    G4int ICdet, bCDet, CFdet, CCdet, CBdet;
+
+    G4cout << "GetTreesInfo() is called" << G4endl;
+    G4int solenoidStatus = GetConfigValueAsInt("Solenoid","solenoidStatus");
+    if (solenoidStatus){
+        ICdet = GetConfigValueAsInt("Solenoid","inFrontCore");
+        if (ICdet>0){
+            histos.push_back(HistoInfo("inFrontCore", 0));
+        }
+        bCDet = GetConfigValueAsInt("Solenoid","behindCore");
+        if (bCDet){
+            histos.push_back(HistoInfo("behindCore",ICdet));
+        }
+    }
+    G4int caloStatus = GetConfigValueAsInt("Calorimeter","calorimeterStatus");
+    if(caloStatus){
+        CFdet = GetConfigValueAsInt("Calorimeter","frontDetector");
+        if(CFdet){
+            G4int histID = solenoidStatus*(ICdet+bCDet);
+            histos.push_back(HistoInfo("inFrontCalo", histID));
+        }
+        // CBdet = GetConfigValueAsInt("Calorimeter","backDetector");
+        // if(CBdet){
+        //     G4int histID = solenoidStatus*(ICdet+bCDet)+CFdet;
+        //     histos.push_back(HistoInfo("behindCalo", histID));
+        // }
+    }
+    G4cout << "histos size: " << histos.size() << G4endl;
+    return histos;
+}
+
+
 std::vector<BranchInfo> ConfigReader::GetBranchesInfo(const std::string& treeName) const {
     std::vector<BranchInfo> branches;
     

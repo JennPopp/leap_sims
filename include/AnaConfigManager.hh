@@ -17,6 +17,7 @@ class AnaConfigManager {
     //member functions  
     void SetUp(const G4Run* aRun, G4String outFileName);
     void BookNtuples();
+    void BookHistos();
     void Save() const;
 
     void FillBaseNtuple_summary(int tupleID,
@@ -31,6 +32,7 @@ class AnaConfigManager {
     void FillCaloCrystNtuple_summary(int tupleID,
                                     const std::vector<double> Edep,
                                     const std::vector<double> Tlength) const;
+    void FillHistos(int histoID, G4Step* step) const;
     void SetupMetadataTTree();
 
     //getter methods 
@@ -42,6 +44,9 @@ class AnaConfigManager {
     }
     const std::vector<TreeInfo>& GetTreesInfo() const {
         return fTreesInfo;
+    }
+    const std::vector<HistoInfo>& GetHistoInfo() const {
+        return fHistoInfo;
     }
     std::map<std::string, int>& GetNtupleNameToIdMap(){
     return fNtupleNameToIdMap;
@@ -63,7 +68,7 @@ class AnaConfigManager {
     const int fShowerDevStat;
     const std::vector<TreeInfo> fTreesInfo; // tree info is structure with name, title and id
     std::map<std::string, int> fNtupleNameToIdMap; // need this for defining sensitive volumes in the subdetector classes
-
+    const std::vector<HistoInfo>fHistoInfo;
 }; 
 
 

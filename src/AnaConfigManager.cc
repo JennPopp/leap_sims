@@ -69,7 +69,7 @@ void AnaConfigManager::BookNtuples() {
 
 void AnaConfigManager::BookHistos(){
     // Get the number of bins for both types of histograms 
-    int nbinsE = fConfig.GetConfigValueAsInt("Output","nbinsE");
+    double binWidthE = fConfig.GetConfigValueAsDouble("Output","binWidthE");
     int nbinsProf = fConfig.GetConfigValueAsInt("Output","nbinsProf");
 
     // Get the maximum energy of the bremsspec
@@ -110,13 +110,16 @@ void AnaConfigManager::BookHistos(){
         Emax = 100.0;
     }
 
+    int nbinsE = int(Emax/binWidthE);
+    G4cout << "NUMBER OF BINS  ="<< nbinsE <<"......................." << G4endl;
+
     // now get the actual booking done for every sd with histo
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     for (const auto& histoInfo : fHistoInfo) {
         
         // Histo with the particle total energy spectrum 
         analysisManager->CreateH1(histoInfo.title,
-        "E_tot_spec", nbinsE, 0. , Emax);
+        "E_tot_spec", nbinsE, 0. , nbinsE*binWidthE);
 
         // Histo with the beam profile 
         analysisManager->CreateH2(histoInfo.title, "Beam Profile", 

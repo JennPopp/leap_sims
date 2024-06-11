@@ -18,11 +18,13 @@ BaseSensitiveDetector::BaseSensitiveDetector(const G4String& name, const std::st
 BaseSensitiveDetector::~BaseSensitiveDetector() {}
 
 G4bool BaseSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* history) {
-    // No matter what the output format, always fill the histograms !  
-    fAnaConfigManager.FillHistos(fTupleID,step);
+    
     
     // Common data processing logic, using layerIdentifier for differentiation
     if (step->GetPostStepPoint()->GetMomentumDirection().z() > 0){
+        // No matter what the output format, always fill the histograms !  
+        fAnaConfigManager.FillHistos(fTupleID,step);
+
         if (fOutputMode == "detailed") {
             fAnaConfigManager.FillBaseNtuple_detailed(fTupleID, step);
         } else { // outputmode == summary as default 

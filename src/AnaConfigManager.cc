@@ -80,30 +80,45 @@ void AnaConfigManager::BookHistos(){
         Emax = fConfig.GetConfigValueAsDouble("GPS","energy");
     }else if(eneType == "User"){
         // get the highest histo value
-        std::string histFilePath = fConfig.GetConfigValue("GPS", "histName");
-        // Open the text file
-        std::ifstream histFile(histFilePath);
-        if (!histFile.is_open()) {
-            std::cerr << "Error: Cannot open the file: " << histFilePath << std::endl;
-            return;
-        }
+        std::string histFilePath = fConfig.GetConfigValue("GPS", "histname");
+    
+    // Print the file path to ensure it's correct
+    if (histFilePath.empty()) {
+        std::cerr << "Error: Configuration returned an empty file path." << std::endl;
+        return;
+    } else {
+        std::cout << "File path obtained from config: " << histFilePath << std::endl;
+    }
 
-        // Read the last line to get the maximum energy value
-        std::string line;
-        std::string lastLine;
-        while (std::getline(histFile, line)) {
-            if (!line.empty()) {
-                lastLine = line;
-            }
-        }
+    // Print the file path to ensure it's correct
+    std::cout << "Attempting to open file: " << histFilePath << std::endl;
 
-        histFile.close();
+    // Open the text file
+    std::ifstream histFile(histFilePath);
+    if (!histFile.is_open()) {
+        std::cerr << "Error: Cannot open the file: " << histFilePath << std::endl;
+        return;
+    }
+
+    // Read the last line to get the maximum energy value
+    std::string line;
+    std::string lastLine;
+    while (std::getline(histFile, line)) {
+        if (!line.empty()) {
+            lastLine = line;
+        }
+    }
+
+    histFile.close();
+
+    // Process the last line as needed
+    std::cout << "Last line: " << lastLine << std::endl;
 
         // Parse the last line to get the maximum energy value
         std::istringstream iss(lastLine);
         std::string dummy;
         double energy;
-        if (iss >> dummy >> dummy >> energy) {
+        if (iss >> dummy >> energy >> dummy) {
             Emax = energy;
         }
     }else{

@@ -5,12 +5,14 @@
 #include "G4Step.hh"
 #include "G4RunManager.hh"
 #include "G4AnalysisManager.hh"
+#include "G4SystemOfUnits.hh"
 
 AnaConfigManager::AnaConfigManager(const ConfigReader& config)
   : fConfig(config),
     fOutputMode(config.ReadOutputMode()),
     fOutputFileName(config.ReadOutputFileName()),
     fTreesInfo(config.ReadTreesInfo()),
+    fHistoInfo(config.ReadHistoInfo()),
     fEinLim(config.ReadEinLim()),
     fShowerDevStat(config.ReadShowerDevStat()) {
     
@@ -43,6 +45,9 @@ void AnaConfigManager::SetUp( const G4Run* aRun,
     // Book the ntuples (GEANT4 lingo for Ttrees)
     BookNtuples();
 
+    // Create the histograms 
+    BookHistos();
+
 };
 
 void AnaConfigManager::BookNtuples() {
@@ -59,6 +64,66 @@ void AnaConfigManager::BookNtuples() {
             }
         }
         analysisManager->FinishNtuple();
+    }
+};
+
+void AnaConfigManager::BookHistos(){
+    // Get the number of bins for both types of histograms 
+    double binWidthE = fConfig.GetConfigValueAsDouble("Output","binWidthE");
+    int nbinsProf = fConfig.GetConfigValueAsInt("Output","nbinsProf");
+
+    // Get the maximum energy of the bremsspec
+    std::string eneType = fConfig.GetConfigValue("GPS","eneType");
+
+    double Emax;
+    if (eneType == "Gauss"){
+        Emax = fConfig.GetConfigValueAsDouble("GPS","energy");
+    }else if(eneType == "User"){
+        // get the highest histo value
+        std::string histFilePath = fConfig.GetConfigValue("GPS", "histName");
+        // Open the text file
+        std::ifstream histFile(histFilePath);
+        if (!histFile.is_open()) {
+            std::cerr << "Error: Cannot open the file: " << histFilePath << std::endl;
+            return;
+        }
+
+        // Read the last line to get the maximum energy value
+        std::string line;
+        std::string lastLine;
+        while (std::getline(histFile, line)) {
+            if (!line.empty()) {
+                lastLine = line;
+            }
+        }
+
+        histFile.close();
+
+        // Parse the last line to get the maximum energy value
+        std::istringstream iss(lastLine);
+        std::string dummy;
+        double energy;
+        if (iss >> dummy >> dummy >> energy) {
+            Emax = energy;
+        }
+    }else{
+        Emax = 100.0;
+    }
+
+    int nbinsE = int(Emax/binWidthE);
+    G4cout << "NUMBER OF BINS  ="<< nbinsE <<"......................." << G4endl;
+
+    // now get the actual booking done for every sd with histo
+    G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+    for (const auto& histoInfo : fHistoInfo) {
+        
+        // Histo with the particle total energy spectrum 
+        analysisManager->CreateH1(histoInfo.title,
+        "E_tot_spec", nbinsE, 0. , nbinsE*binWidthE);
+
+        // Histo with the beam profile 
+        analysisManager->CreateH2(histoInfo.title, "Beam Profile", 
+        nbinsProf, -60.0*mm, 60.0*mm, nbinsProf, -60.0*mm, 60.0*mm);
     }
 };
 
@@ -195,7 +260,16 @@ void AnaConfigManager::FillCaloCrystNtuple_summary(int tupleID,
         analysisManager->FillNtupleDColumn(tupleID, 9+i, Edep_ct[i]);
     }
     analysisManager->AddNtupleRow(tupleID);
-}
+};
+
+
+void AnaConfigManager::FillHistos(int ID, G4Step* step)const{
+    G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+    auto PSP = step->GetPostStepPoint();
+    auto ene = PSP->GetTotalEnergy()/CLHEP::MeV;
+    analysisManager->FillH1(ID,ene);
+    analysisManager->FillH2(ID, PSP->GetPosition().x(),PSP->GetPosition().y(),ene);
+};
 
 void AnaConfigManager::SetupMetadataTTree() {
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();

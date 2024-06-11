@@ -23,6 +23,8 @@ CaloFrontSensitiveDetector::CaloFrontSensitiveDetector(const G4String& name, con
 CaloFrontSensitiveDetector::~CaloFrontSensitiveDetector() {}
 
 G4bool CaloFrontSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* history) {
+    // No matter what the output format, always fill the histograms !  
+    fAnaConfigManager.FillHistos(fTupleID,step);
 
     // Add some 
     //G4cout << "ProcessHits called for volume: " << step->GetPreStepPoint()->GetPhysicalVolume()->GetName() << G4endl;

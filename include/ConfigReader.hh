@@ -22,6 +22,13 @@ struct TreeInfo {
         : name(n), title(t), id(i) {}
 };
 
+struct HistoInfo{
+    std::string title; 
+    int id;
+    HistoInfo(const std::string& t, int i)
+    : title(t), id(i) {}
+};
+
 class ConfigReader {
 public:
     ConfigReader(const std::string& configFile);
@@ -38,6 +45,7 @@ public:
     //methods for reading tree and branch configurations 
     std::vector<TreeInfo> ReadTreesInfo() const;
     std::vector<BranchInfo> GetBranchesInfo(const std::string& treeName) const;
+    std::vector<HistoInfo> ReadHistoInfo() const;
 
 private:
     std::string fConfigFile;

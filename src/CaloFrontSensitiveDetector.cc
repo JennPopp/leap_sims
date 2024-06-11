@@ -23,14 +23,16 @@ CaloFrontSensitiveDetector::CaloFrontSensitiveDetector(const G4String& name, con
 CaloFrontSensitiveDetector::~CaloFrontSensitiveDetector() {}
 
 G4bool CaloFrontSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* history) {
-    // No matter what the output format, always fill the histograms !  
-    fAnaConfigManager.FillHistos(fTupleID,step);
+    
 
     // Add some 
     //G4cout << "ProcessHits called for volume: " << step->GetPreStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
     // Common data processing logic, using layerIdentifier for differentiation
     //G4cout << "ProcessHits called: Momentum direction" << step->GetPostStepPoint()->GetMomentumDirection().z() << G4endl;
     if (step->GetPreStepPoint()->GetMomentumDirection().z() > 0 ){
+        // No matter what the output format, always fill the histograms !  
+        fAnaConfigManager.FillHistos(fTupleID,step);
+
         // definde the if condition to check the total energy is reached.
         G4double Estep = step->GetPostStepPoint()->GetTotalEnergy()/MeV;
         fEin_tot += Estep;

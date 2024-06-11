@@ -134,7 +134,7 @@ void AnaConfigManager::BookHistos(){
         
         // Histo with the particle total energy spectrum 
         analysisManager->CreateH1(histoInfo.title,
-        "E_tot_spec", nbinsE, 0. , nbinsE*binWidthE);
+        "E_tot_spec", nbinsE, 0. , nbinsE*binWidthE+1.0);
 
         // Histo with the beam profile 
         analysisManager->CreateH2(histoInfo.title, "Beam Profile", 

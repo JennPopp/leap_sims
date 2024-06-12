@@ -15,9 +15,9 @@ AnaConfigManager::AnaConfigManager(const ConfigReader& config)
     fHistoInfo(config.ReadHistoInfo()),
     fEinLim(config.ReadEinLim()),
     fShowerDevStat(config.ReadShowerDevStat()) {
-    
+
     G4cout << "\n----> The output mode is " << fOutputMode << "\n" << G4endl;
-   
+
     G4cout << "\n----> The registered detectors are :" << G4endl;
     for (const auto& treeInfo : fTreesInfo) {
         G4cout << treeInfo.name << G4endl;
@@ -27,7 +27,7 @@ AnaConfigManager::AnaConfigManager(const ConfigReader& config)
 
 AnaConfigManager::~AnaConfigManager() {}
 
-void AnaConfigManager::SetUp( const G4Run* aRun, 
+void AnaConfigManager::SetUp( const G4Run* aRun,
                               G4String outFileName) {
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     analysisManager->SetDefaultFileType("root");
@@ -37,7 +37,7 @@ void AnaConfigManager::SetUp( const G4Run* aRun,
     std :: ostringstream oss;
     oss << "run"<< aRun->GetRunID()<< "_"<< outFileName ;
     G4String fileName=oss.str();
-    
+
     // Open file histogram file
     //G4cout << "THE ANALYSIS MANAGER CALLS OPENFILE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "<< G4endl;
     analysisManager->OpenFile(fileName);
@@ -45,7 +45,7 @@ void AnaConfigManager::SetUp( const G4Run* aRun,
     // Book the ntuples (GEANT4 lingo for Ttrees)
     BookNtuples();
 
-    // Create the histograms 
+    // Create the histograms
     BookHistos();
 
 };
@@ -68,7 +68,7 @@ void AnaConfigManager::BookNtuples() {
 };
 
 void AnaConfigManager::BookHistos(){
-    // Get the number of bins for both types of histograms 
+    // Get the number of bins for both types of histograms
     double binWidthE = fConfig.GetConfigValueAsDouble("Output","binWidthE");
     int nbinsProf = fConfig.GetConfigValueAsInt("Output","nbinsProf");
 
@@ -81,7 +81,7 @@ void AnaConfigManager::BookHistos(){
     }else if(eneType == "User"){
         // get the highest histo value
         std::string histFilePath = fConfig.GetConfigValue("GPS", "histname");
-    
+
     // Print the file path to ensure it's correct
     if (histFilePath.empty()) {
         std::cerr << "Error: Configuration returned an empty file path." << std::endl;
@@ -125,19 +125,19 @@ void AnaConfigManager::BookHistos(){
         Emax = 100.0;
     }
 
-    int nbinsE = int(Emax/binWidthE);
+    int nbinsE = int((Emax+1)/binWidthE);
     G4cout << "NUMBER OF BINS  ="<< nbinsE <<"......................." << G4endl;
 
     // now get the actual booking done for every sd with histo
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     for (const auto& histoInfo : fHistoInfo) {
-        
-        // Histo with the particle total energy spectrum 
-        analysisManager->CreateH1(histoInfo.title,
-        "E_tot_spec", nbinsE, 0. , nbinsE*binWidthE+1.0);
 
-        // Histo with the beam profile 
-        analysisManager->CreateH2(histoInfo.title, "Beam Profile", 
+        // Histo with the particle total energy spectrum
+        analysisManager->CreateH1(histoInfo.title,
+        "E_tot_spec", nbinsE, 0. , nbinsE*binWidthE);
+
+        // Histo with the beam profile
+        analysisManager->CreateH2(histoInfo.title, "Beam Profile",
         nbinsProf, -60.0*mm, 60.0*mm, nbinsProf, -60.0*mm, 60.0*mm);
     }
 };
@@ -186,9 +186,9 @@ void AnaConfigManager::FillCaloFrontTuple_detailed(int tupleID,const G4VTouchabl
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     auto track = step->GetTrack();
     auto PSP = step->GetPostStepPoint();
-    int motherdepth = 1; 
+    int motherdepth = 1;
     if (step->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "VacStep4") {
-        motherdepth = 1;// changed the mother volume of the Vacstep4 to calovirtuel volume so not motherdepth = 2 ( for Alu as mother) but same as Fontdetector 1  
+        motherdepth = 1;// changed the mother volume of the Vacstep4 to calovirtuel volume so not motherdepth = 2 ( for Alu as mother) but same as Fontdetector 1
     }
 
     analysisManager->FillNtupleIColumn(tupleID,0, track->GetParticleDefinition()->GetPDGEncoding());
@@ -313,5 +313,5 @@ void AnaConfigManager::SetupMetadataTTree() {
             analysisManager->AddNtupleRow(tupleID);
         }
     }
-    
+
 }

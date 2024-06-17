@@ -17,10 +17,10 @@ SolenoidMessenger::SolenoidMessenger(Solenoid* solenoid)
   fDirectory = new G4UIdirectory("/solenoid/");
   fDirectory->SetGuidance("Solenoid control");
 
-  fSetBzCmd = new G4UIcmdWithADoubleAndUnit("/solenoid/setBz", this);
+  fSetBzCmd = new G4UIcmdWithADouble("/solenoid/setBz", this);
   fSetBzCmd->SetGuidance("Set the magnetic field strength along z.");
   fSetBzCmd->SetParameterName("Bz", false);
-  fSetBzCmd->SetUnitCategory("Magnetic flux density");
+  //fSetBzCmd->SetUnitCategory("Magnetic flux density");
   fSetBzCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 
   fListFieldsCmd = new G4UIcmdWithoutParameter("/solenoid/listMagneticFields", this);
@@ -56,9 +56,9 @@ void SolenoidMessenger::ListMagneticFields() {
             G4double fieldValue[3]; // Bx, By, Bz
             uniformField->GetFieldValue(point, fieldValue);
             G4cout << "Uniform Magnetic Field Value: "
-                   << fieldValue[0] << " tesla, "
-                   << fieldValue[1] << " tesla, "
-                   << fieldValue[2] << " tesla" << G4endl;
+                   << fieldValue[0] /tesla<< " tesla, "
+                   << fieldValue[1] /tesla<< " tesla, "
+                   << fieldValue[2] /tesla<< " tesla" << G4endl;
         } else {
             G4cout << "Non-uniform magnetic field detected. Field values at specific points:" << G4endl;
             // Sample the field at a specific point
@@ -66,9 +66,9 @@ void SolenoidMessenger::ListMagneticFields() {
             G4double fieldValue[6];
             magField->GetFieldValue(samplePoint, fieldValue);
             G4cout << "Magnetic Field at (0,0,0): "
-                   << fieldValue[0] << " tesla, "
-                   << fieldValue[1] << " tesla, "
-                   << fieldValue[2] << " tesla" << G4endl;
+                   << fieldValue[0] /tesla<< " tesla, "
+                   << fieldValue[1] /tesla<< " tesla, "
+                   << fieldValue[2] /tesla<< " tesla" << G4endl;
         }
     } else {
         G4cout << "No magnetic fields registered." << G4endl;

@@ -130,7 +130,7 @@ void MacroGenerator::generateMacro(const ConfigReader& config, const std::string
 
         //Then the Bfield and or the pol degree needs to be changed to the negative value 
         if (Bstat){
-            macroFile << "/solenoid/setBz -" << Bz << " tesla" << std::endl;
+            macroFile << "/solenoid/setBz -" << Bz << std::endl;
             macroFile << "/solenoid/listMagneticFields"<<std::endl;
         }
         

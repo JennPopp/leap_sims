@@ -5,7 +5,7 @@
 #include "G4UIcommand.hh"
 #include "G4UIparameter.hh"
 #include "G4UIcmdWithoutParameter.hh"
-#include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4UIcmdWithADouble.hh"
 
 // Forward declaration
 class Solenoid;
@@ -13,7 +13,7 @@ class Solenoid;
 class SolenoidMessenger : public G4UImessenger {
 private:
     Solenoid* fSolenoid; // Pointer to the solenoid
-    G4UIcmdWithADoubleAndUnit* fSetBzCmd; // Command to set fBz
+    G4UIcmdWithADouble* fSetBzCmd; // Command to set fBz
     G4UIdirectory* fDirectory;
     G4UIcmdWithoutParameter* fListFieldsCmd;
 

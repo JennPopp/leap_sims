@@ -4,8 +4,10 @@
 1.  set the environment:  
   `source /cvmfs/ilc.desy.de/key4hep/releases/089d775cf2/key4hep-stack/2023-07-24/x86_64-centos7-gcc12.3.0-opt/zs7ye/setup.sh`
     This release uses GEANT 11.1.1 , CAUTION: the current version of leapsims is not compatible with GEANT 11.2, but we're working on it
-    
-2.  make a build directory and change to the build directory:  
+    For the use on NAF since the update from centos7 to centos9 you have to use:
+    `source /cvmfs/sft.cern.ch/lcg/views/LCG_103/x86_64-centos9-gcc12-opt/setup.sh`
+    This release uses GEANT 11.1.1  and the same compiler as the key4hep stack but runs on centos9.
+3.  make a build directory and change to the build directory:  
   `mkdir build`  
   `cd build`  
 

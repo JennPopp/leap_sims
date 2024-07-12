@@ -31,7 +31,7 @@ private:
     G4LogicalVolume* fLogicFrontDet;
     G4LogicalVolume* fLogicBackDet;
     G4double fVirtCaloLength;
-
+    G4double ffrontZPos;// front position des 
 
 };
 

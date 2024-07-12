@@ -7,7 +7,7 @@
 
 class CaloFrontSensitiveDetector : public G4VSensitiveDetector {
 public:
-    CaloFrontSensitiveDetector(const G4String& name, const std::string& layerIdentifier, int tupleID, AnaConfigManager& anaConfigManager);
+    CaloFrontSensitiveDetector(const G4String& name, const std::string& layerIdentifier, int tupleID, AnaConfigManager& anaConfigManager,const G4double frontZPos);
     virtual ~CaloFrontSensitiveDetector();
 
     virtual G4bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
@@ -26,6 +26,7 @@ private:
     std::vector<int> fNtot;
     G4double fEinLim;
     G4double fEin_tot;
+    G4double ffrontZPos; // posisiton of the front sensitive detector 
     // Additional private members
     const std::string fLayerIdentifier;
     int fTupleID;

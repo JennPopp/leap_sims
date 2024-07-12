@@ -5,7 +5,7 @@
 #include "G4RunManager.hh"
 
 
-CaloFrontSensitiveDetector::CaloFrontSensitiveDetector(const G4String& name, const std::string& layerIdentifier, int tupleID, AnaConfigManager& anaConfigManager)
+CaloFrontSensitiveDetector::CaloFrontSensitiveDetector(const G4String& name, const std::string& layerIdentifier, int tupleID, AnaConfigManager& anaConfigManager, const G4double frontZPos)
     : G4VSensitiveDetector(name),
       fLayerIdentifier(layerIdentifier),
       fTupleID(tupleID),
@@ -14,7 +14,8 @@ CaloFrontSensitiveDetector::CaloFrontSensitiveDetector(const G4String& name, con
       fEinLim(anaConfigManager.GetEinLim()),
       fEnergySum(9),
       fNtot(9),
-      fEin_tot(0.)
+      fEin_tot(0.),
+      ffrontZPos(frontZPos)
 
 {
     G4cout << "Constructing CaloFrontSensitiveDetector. Address: " << this << ", Size: " << fEnergySum.size() << G4endl;
@@ -23,13 +24,23 @@ CaloFrontSensitiveDetector::CaloFrontSensitiveDetector(const G4String& name, con
 CaloFrontSensitiveDetector::~CaloFrontSensitiveDetector() {}
 
 G4bool CaloFrontSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* history) {
-    
+    // G4cout << "ZPOS OF THE FORNT DETECTOR" << ffrontZPos << G4endl;
+    // G4double preStepZ = step->GetPreStepPoint()->GetPosition().z();
+    // G4double postStepZ = step->GetPostStepPoint()->GetPosition().z();
+    // G4cout << "ZPOS OF THE PRESTEPPOINT " << preStepZ << G4endl;
+    // G4cout << "ZPOS OF THE POSTSTEPPOINT " << postStepZ << G4endl;
+
+    // This is needet to transform the z pos of the step to the local posion 
+    G4StepPoint* preStepPoint = step->GetPreStepPoint();
+    G4ThreeVector globalPosition = preStepPoint->GetPosition();
+    G4double localZ = preStepPoint->GetTouchableHandle()->GetHistory()->GetTransform(2).TransformPoint(globalPosition).z();
+    // G4cout << "LOCAL ZPOS OF THE PRESTEPPOINT " << localZ << G4endl;
 
     // Add some 
     //G4cout << "ProcessHits called for volume: " << step->GetPreStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
     // Common data processing logic, using layerIdentifier for differentiation
     //G4cout << "ProcessHits called: Momentum direction" << step->GetPostStepPoint()->GetMomentumDirection().z() << G4endl;
-    if (step->GetPreStepPoint()->GetMomentumDirection().z() > 0 ){
+    if (preStepPoint->GetMomentumDirection().z() > 0 && (localZ == ffrontZPos-0.5 || localZ == -ffrontZPos-0.5 )){
         // No matter what the output format, always fill the histograms !  
         fAnaConfigManager.FillHistos(fTupleID,step);
 
@@ -46,12 +57,12 @@ G4bool CaloFrontSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*
         }
 
         if (fOutputMode == "detailed") {
-            auto touchable = step->GetPreStepPoint()->GetTouchable();
+            auto touchable = preStepPoint->GetTouchable();
             fAnaConfigManager.FillCaloFrontTuple_detailed(fTupleID, touchable, step);
         } else { // outputmode == summary as default 
-            auto touchable = step->GetPreStepPoint()->GetTouchable();
+            auto touchable = preStepPoint->GetTouchable();
             int motherdepth = 1; 
-            if (step->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "VacStep4") {
+            if (preStepPoint->GetPhysicalVolume()->GetName() == "VacStep4") {
                 motherdepth = 1; // changed the mother volume of the Vacstep4 to calovirtuel volume so not motherdepth =2 ( for Alu as mother) but same as Fontdetector 1 
             }
             int crystNo = touchable->GetReplicaNumber(motherdepth);

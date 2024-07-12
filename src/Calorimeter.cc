@@ -35,6 +35,7 @@ Calorimeter::Calorimeter(const ConfigReader& config, AnaConfigManager& anaConfig
     }
     fCaloMat = config.GetConfigValue("Calorimeter","caloMaterial");
     fWorldMaterial = config.GetConfigValue("World", "material");
+
 }
 
 //The destructor:
@@ -245,9 +246,11 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
   // virtual detectors in front of and behind the crystals    
   //---------------------------------------------------------------
 
+  ffrontZPos = -calorcelllength/2+detThick/2;
+
   G4Box* solidVacStep = new G4Box("solidVacStepCalo",  //Name
-                                  calorcellxy/2.,// former cystalXY now size of the calo chell 
-                                  calorcellxy/2,// former cystalXY now size of the calo chell 
+                                  crystXY/2.,// former cystalXY now size of the calo chell changed back from 
+                                  crystXY/2,// former cystalXY now size of the calo chell changed back from calorcellxy
                                   detThick/2.);
 
   fLogicFrontDet = new G4LogicalVolume(solidVacStep,    //its solid
@@ -255,7 +258,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                         "logicCaloFrontDet");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0., -calorcelllength/2+detThick/2),    //its position old 0.,0.,-(aluwraplength/2+detThick/2.)
+                    G4ThreeVector(0.,0., ffrontZPos),    //its position old 0.,0.,-(aluwraplength/2+detThick/2.)
                     fLogicFrontDet,            //its logical volume
                     "physCaloFrontDet",                 //its name
                     logicCaloCell,               //its mother //old fCaloCellLV
@@ -396,7 +399,7 @@ void Calorimeter::ConstructCalorimeterSD(){
       if (it != mapping.end()) {
           int ID = it->second;
           G4cout << "--------0000000000000----------- ::: THE TUPLE ID IS:" << ID << G4endl;
-          auto sdIC = new CaloFrontSensitiveDetector(ntupleName, ntupleName, ID, fAnaConfigManager);
+          auto sdIC = new CaloFrontSensitiveDetector(ntupleName, ntupleName, ID, fAnaConfigManager, ffrontZPos);
           G4SDManager::GetSDMpointer()->AddNewDetector(sdIC);
           // Retrieve the logical volume for this layer and set its SD
           fLogicFrontDet->SetSensitiveDetector(sdIC );
@@ -409,7 +412,7 @@ void Calorimeter::ConstructCalorimeterSD(){
       if (it != mapping.end()) {
           int ID = it->second;
           G4cout << "--------0000000000000----------- ::: THE TUPLE ID IS:" << ID << G4endl;
-          auto sdBC = new CaloFrontSensitiveDetector(ntupleName, ntupleName, ID, fAnaConfigManager);
+          auto sdBC = new CaloFrontSensitiveDetector(ntupleName, ntupleName, ID, fAnaConfigManager,ffrontZPos);
           G4SDManager::GetSDMpointer()->AddNewDetector(sdBC);
           // Retrieve the logical volume for this layer and set its SD
           fLogicBackDet->SetSensitiveDetector(sdBC);

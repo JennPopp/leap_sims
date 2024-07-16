@@ -36,6 +36,28 @@ void RunAction::BeginOfRunAction(const G4Run* run) {
     // Initialize the analysis manager and create ntuples here
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     analysisManager->Clear(); // Clear existing analysis objects
+    //Here the accumulative variable in the SD will be 
+    G4SDManager* sdManager = G4SDManager::GetSDMpointer();
+
+    if(fOutputMode == "SumRun"){
+    for (const auto& treeInfo : fTreesInfo) {
+        G4VSensitiveDetector* mySD = sdManager->FindSensitiveDetector(treeInfo.name);
+
+        if (mySD) {
+            //G4cout << "Reset: " << treeInfo.name << G4endl;
+            if (treeInfo.name == "inFrontCalo" || treeInfo.name == "behindCalo"){
+                CaloFrontSensitiveDetector* specSD = dynamic_cast<CaloFrontSensitiveDetector*>(mySD);
+                specSD->Reset();
+            }else if (treeInfo.name == "CaloCrystal"){
+                CaloCrystalSD* specSD = dynamic_cast<CaloCrystalSD*>(mySD);
+                specSD->Reset();
+            }else{
+                BaseSensitiveDetector* specSD = dynamic_cast<BaseSensitiveDetector*>(mySD);
+                specSD->Reset();
+            }
+        }
+     }
+    }
     fAnaConfigManager.SetUp(run, outputFileName); 
 
     G4cout << "....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......" << G4endl;

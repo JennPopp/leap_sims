@@ -8,6 +8,7 @@
 #include "G4PVPlacement.hh"
 #include "G4Box.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4RotationMatrix.hh"
 namespace leap
 {
 
@@ -31,6 +32,11 @@ DetectorConstruction::DetectorConstruction(const ConfigReader& config, AnaConfig
     
     fcaloXpos = config.GetConfigValueAsDouble("Calorimeter","xpos")*mm;
     fcaloYpos = config.GetConfigValueAsDouble("Calorimeter","ypos")*mm;
+
+    fcaloXRot = config.GetConfigValueAsDouble("Calorimeter","xRot");
+    fcaloYRot = config.GetConfigValueAsDouble("Calorimeter","yRot");
+    fmagXRot =  config.GetConfigValueAsDouble("Solenoid","xRot");
+    fmagYRot =  config.GetConfigValueAsDouble("Solenoid","yRot");
   }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -69,7 +75,11 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
   if (fConfig.GetConfigValueAsInt("Solenoid","solenoidStatus")){
     G4LogicalVolume* logicSolenoid = fSolenoid->ConstructSolenoid();
     magThick = fSolenoid->GetMagThick();
-    new G4PVPlacement(0,
+    G4cout << ".....................................................................................................magThick is "<< magThick << G4endl;
+    G4RotationMatrix* MagRotation = new G4RotationMatrix();
+    MagRotation->rotateY(fmagYRot * deg);
+    MagRotation->rotateX(fmagXRot * deg);
+    new G4PVPlacement(MagRotation, //Rotation of the Polarimeter
                       G4ThreeVector(0,0,magThick/2.0), 
                       logicSolenoid, 
                       "physicalSolenoid", 
@@ -77,12 +87,15 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
                       false, 
                       0); 
   }
-  G4cout << ".....................................................................................................magThick is "<< magThick << G4endl;
+  
   if (fConfig.GetConfigValueAsInt("Calorimeter","calorimeterStatus")){
     G4LogicalVolume* logicCalo = fCalo->ConstructCalo();
     G4double caloLength = fCalo->GetVirtCaloLength();
     G4cout << ".....................................................................................................caloLength is "<< caloLength << G4endl;
-    new G4PVPlacement(0,
+    G4RotationMatrix* CaloRotation = new G4RotationMatrix();
+    CaloRotation->rotateY(fcaloYRot * deg);
+    CaloRotation->rotateX(fcaloXRot * deg);
+    new G4PVPlacement(CaloRotation, //Rotation of the Calorimeter 
                       G4ThreeVector(fcaloXpos,fcaloYpos,magThick+fDist2Pol+caloLength/2.), 
                       logicCalo, 
                       "physicalCalo", 

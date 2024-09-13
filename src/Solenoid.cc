@@ -54,6 +54,10 @@ Solenoid::Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManage
 
 Solenoid::~Solenoid() {
   delete fMessenger;
+  if (fSolenoidMagneticField) {
+    delete fSolenoidMagneticField;  // Properly delete the magnetic field
+    fSolenoidMagneticField = nullptr;  // Set to nullptr to avoid dangling pointer
+  }
 }
 
 G4LogicalVolume* Solenoid::ConstructSolenoid() {
@@ -410,12 +414,12 @@ void Solenoid::ConstructSolenoidBfield(){
   //G4cout << "Constructing solenoid magnetic field with Bz = " << fBz << " tesla" << G4endl;
 
   // define the magnetic field (start with uniform:))
-  G4UniformMagField* solenoidMagneticField = new G4UniformMagField(G4ThreeVector(0., 0., fBz)* tesla);
+  fSolenoidMagneticField = new G4UniformMagField(G4ThreeVector(0., 0., fBz)* tesla);
 
   // Create a field manager and set the magnetic field
   G4FieldManager* fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  fieldMgr->SetDetectorField(solenoidMagneticField);
-  fieldMgr->CreateChordFinder(solenoidMagneticField);
+  fieldMgr->SetDetectorField(fSolenoidMagneticField);
+  fieldMgr->CreateChordFinder(fSolenoidMagneticField);
 
   // Set the field manager for the logical volume of the iron core
   fLogicCore->SetFieldManager(fieldMgr, true);

@@ -6,6 +6,7 @@
 #include "ConfigReader.hh"
 #include "AnaConfigManager.hh"
 #include "SolenoidMessenger.hh"
+#include "G4UniformMagField.hh"
 
 class Solenoid{
 public:
@@ -42,6 +43,7 @@ private:
     G4LogicalVolume* fLogicCore;
     G4double fBz;
     G4double fMagThick;
+    G4UniformMagField* fSolenoidMagneticField;
 };
 
 #endif

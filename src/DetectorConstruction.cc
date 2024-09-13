@@ -86,6 +86,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
                       logicWorld, 
                       false, 
                       0); 
+    delete MagRotation;  // Delete the rotation matrix when done
   }
   
   if (fConfig.GetConfigValueAsInt("Calorimeter","calorimeterStatus")){
@@ -102,6 +103,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
                       logicWorld, 
                       false, 
                       0); 
+    delete CaloRotation;  // Delete the rotation matrix when done
   }
 
   return physWorld;

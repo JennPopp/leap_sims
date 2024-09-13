@@ -385,7 +385,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                               logicCaloMother,               //its mother
                               false,                     //no boolean operat
                               1);                        //copy number
-  
+    delete zRot;
   }
 
 return logicCaloMother;

@@ -32,6 +32,10 @@ private:
     G4LogicalVolume* fLogicBackDet;
     G4double fVirtCaloLength;
     G4double ffrontZPos;// front position des 
+    G4VisAttributes* fAluVis;
+    G4VisAttributes* fCrystalVis;
+    G4VisAttributes* fDetVis;
+    G4VisAttributes* fFrontPlateVis;
 
 };
 

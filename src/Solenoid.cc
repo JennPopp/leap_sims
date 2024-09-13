@@ -35,8 +35,10 @@ const std::string red = "\033[31m";
 const std::string reset = "\033[0m";
 
 Solenoid::Solenoid(const ConfigReader& config, AnaConfigManager& anaConfigManager)
-  : fConfig(config), fAnaConfigManager(anaConfigManager), fMessenger(new SolenoidMessenger(this)){
-    // Read configuration values and initialize the subdetector
+  : fConfig(config), fAnaConfigManager(anaConfigManager), fMessenger(new SolenoidMessenger(this)),
+    fMagnetVis(nullptr), fCopperCoilVis(nullptr), fLeadTubeVis(nullptr), fIronCoreVis(nullptr) {
+    
+    // Read configuration values and initialize the subdetectord::Solenoid(const ConfigReader& co
     fCoreRad = config.GetConfigValueAsDouble("Solenoid", "coreRad")*mm;
     fCoreLength = config.GetConfigValueAsDouble("Solenoid", "coreLength")*mm;
     fConvThick = config.GetConfigValueAsDouble("Solenoid", "convThick")*mm;
@@ -58,6 +60,10 @@ Solenoid::~Solenoid() {
     delete fSolenoidMagneticField;  // Properly delete the magnetic field
     fSolenoidMagneticField = nullptr;  // Set to nullptr to avoid dangling pointer
   }
+  delete fMagnetVis;
+  delete fCopperCoilVis;
+  delete fLeadTubeVis;
+  delete fIronCoreVis;
 }
 
 G4LogicalVolume* Solenoid::ConstructSolenoid() {
@@ -152,10 +158,10 @@ G4LogicalVolume* Solenoid::ConstructSolenoid() {
                       false,              //no boolean operation
                       0);                 //copy number
 
-    G4VisAttributes * MagnetVis= new G4VisAttributes( G4Colour(255/255. ,102/255. ,102/255. ));
-    MagnetVis->SetVisibility(true);
-    MagnetVis->SetLineWidth(1);
-    logicMagnet->SetVisAttributes(MagnetVis);
+    fMagnetVis= new G4VisAttributes( G4Colour(255/255. ,102/255. ,102/255. ));
+    fMagnetVis->SetVisibility(true);
+    fMagnetVis->SetLineWidth(1);
+    logicMagnet->SetVisAttributes(fMagnetVis);
     //---------------------------------------------------------------
     // copper coils 
     //---------------------------------------------------------------
@@ -178,10 +184,10 @@ G4LogicalVolume* Solenoid::ConstructSolenoid() {
              logicMagnet,     // its mother volume
              false,              // no boolean operation
              0);
-    G4VisAttributes * CopperCoilVis= new G4VisAttributes( G4Colour(255/255. ,0/255. ,255/255. ));
-    CopperCoilVis->SetVisibility(true);
-    CopperCoilVis->SetLineWidth(1);
-    logicCuTube->SetVisAttributes(CopperCoilVis);
+    fCopperCoilVis= new G4VisAttributes( G4Colour(255/255. ,0/255. ,255/255. ));
+    fCopperCoilVis->SetVisibility(true);
+    fCopperCoilVis->SetLineWidth(1);
+    logicCuTube->SetVisAttributes(fCopperCoilVis);
     //---------------------------------------------------------------
     // lead shielding 
     //---------------------------------------------------------------
@@ -206,10 +212,10 @@ G4LogicalVolume* Solenoid::ConstructSolenoid() {
     			    false,              //no boolean operation
     			    0);                 //copy number
 
-    G4VisAttributes * LeadTubeVis= new G4VisAttributes( G4Colour(0/255. ,102/255. ,204/255. ));
-    LeadTubeVis->SetVisibility(true);
-    LeadTubeVis->SetLineWidth(1);
-    logicPbTube->SetVisAttributes(LeadTubeVis);
+    fLeadTubeVis= new G4VisAttributes( G4Colour(0/255. ,102/255. ,204/255. ));
+    fLeadTubeVis->SetVisibility(true);
+    fLeadTubeVis->SetLineWidth(1);
+    logicPbTube->SetVisAttributes(fLeadTubeVis);
 
     //---------------------------------------------------------------
     // conversion target
@@ -272,11 +278,11 @@ G4LogicalVolume* Solenoid::ConstructSolenoid() {
     else{
         G4cout << "YOU ARE NOT USING POLARIZATION !!!!!" << G4endl;
     }
-    G4VisAttributes * IronCoreVis= new G4VisAttributes( G4Colour(51/255. ,51/255. ,255/255. ));
-    IronCoreVis->SetVisibility(true);
-    IronCoreVis->SetLineWidth(2);
-    IronCoreVis->SetForceSolid(true);
-    fLogicCore->SetVisAttributes(IronCoreVis);
+    fIronCoreVis = new G4VisAttributes( G4Colour(51/255. ,51/255. ,255/255. ));
+    fIronCoreVis->SetVisibility(true);
+    fIronCoreVis->SetLineWidth(2);
+    fIronCoreVis->SetForceSolid(true);
+    fLogicCore->SetVisAttributes(fIronCoreVis);
 
     //---------------------------------------------------------------------
     // vacuum steps aka ideal/virtual detector volumes 

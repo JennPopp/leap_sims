@@ -25,7 +25,8 @@
 
 // The constructor: 
 Calorimeter::Calorimeter(const ConfigReader& config, AnaConfigManager& anaConfigManager)
-  : fConfig(config), fAnaConfigManager(anaConfigManager) {
+  : fConfig(config), fAnaConfigManager(anaConfigManager),
+    fAluVis(nullptr), fCrystalVis(nullptr),fDetVis(nullptr),fFrontPlateVis(nullptr) {
     // Read configuration values and initialize the subdetector
     fType = config.GetConfigValue("Calorimeter", "type");
     if (fType != "full"){
@@ -39,7 +40,14 @@ Calorimeter::Calorimeter(const ConfigReader& config, AnaConfigManager& anaConfig
 }
 
 //The destructor:
-Calorimeter::~Calorimeter(){}
+Calorimeter::~Calorimeter(){
+
+    delete fAluVis;
+    delete fCrystalVis;
+    delete fDetVis;
+    delete fFrontPlateVis;
+
+}
 
 // Function to construct the calo mother volume 
 G4LogicalVolume* Calorimeter::ConstructCalo() {
@@ -189,11 +197,11 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                             false,                     //no boolean operat
                             0);                        //copy number
 
-  G4VisAttributes * AluVis= new G4VisAttributes( G4Colour(119/255. ,136/255. ,153/255. ));
-  AluVis->SetVisibility(true);
-  AluVis->SetLineWidth(2);
-  AluVis->SetForceSolid(false);
-  logicAluWrap->SetVisAttributes(AluVis);
+  fAluVis= new G4VisAttributes( G4Colour(119/255. ,136/255. ,153/255. ));
+  fAluVis->SetVisibility(true);
+  fAluVis->SetLineWidth(2);
+  fAluVis->SetForceSolid(false);
+  logicAluWrap->SetVisAttributes(fAluVis);
 
   //---------------------------------------------------------------
   // air gap between aluminium and crystal 
@@ -236,11 +244,11 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                     false,                     //no boolean operat
                     0);                        //copy number
 
-  G4VisAttributes * CrystalVis= new G4VisAttributes( G4Colour(224/255. ,255/255. ,255/255. ));
-  CrystalVis->SetVisibility(true);
-  CrystalVis->SetLineWidth(2);
-  CrystalVis->SetForceSolid(true);
-  fLogicCrystal->SetVisAttributes(CrystalVis);
+  fCrystalVis= new G4VisAttributes( G4Colour(224/255. ,255/255. ,255/255. ));
+  fCrystalVis->SetVisibility(true);
+  fCrystalVis->SetLineWidth(2);
+  fCrystalVis->SetForceSolid(true);
+  fLogicCrystal->SetVisAttributes(fCrystalVis);
 
   //---------------------------------------------------------------
   // virtual detectors in front of and behind the crystals    
@@ -278,12 +286,12 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                         false,                     //no boolean operat
                         0);                        //copy number
 
-  G4VisAttributes * DetVis= new G4VisAttributes( G4Colour(242/255. ,142/255. ,0/255. ));
-  DetVis->SetVisibility(true);
-  DetVis->SetLineWidth(2);
-  DetVis->SetForceSolid(true);
-  fLogicBackDet->SetVisAttributes(DetVis);                     
-  fLogicFrontDet->SetVisAttributes(DetVis);  
+  fDetVis= new G4VisAttributes( G4Colour(242/255. ,142/255. ,0/255. ));
+  fDetVis->SetVisibility(true);
+  fDetVis->SetLineWidth(2);
+  fDetVis->SetForceSolid(true);
+  fLogicBackDet->SetVisAttributes(fDetVis);                     
+  fLogicFrontDet->SetVisAttributes(fDetVis);  
   //---------------------------------------------------------------
   // If the full calorimeter is simulated -> also build housing    
   //---------------------------------------------------------------
@@ -311,9 +319,9 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                               false,                     //no boolean operat
                               0);                        //copy number
 
-    G4VisAttributes* FrontPlateVis = new G4VisAttributes(G4Colour(0,128/255,1));
-    FrontPlateVis->SetForceSolid(true);
-    FrontPlateLV->SetVisAttributes(FrontPlateVis);
+    fFrontPlateVis = new G4VisAttributes(G4Colour(0,128/255,1));
+    fFrontPlateVis->SetForceSolid(true);
+    FrontPlateLV->SetVisAttributes(fFrontPlateVis);
 
     auto FrontPlaneHoleTub = new G4Tubs("FrontPlaneHoleTub",
                                       0.0*mm, // inner radius

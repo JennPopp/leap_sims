@@ -44,6 +44,10 @@ private:
     G4double fBz;
     G4double fMagThick;
     G4UniformMagField* fSolenoidMagneticField;
+    G4VisAttributes* fMagnetVis;
+    G4VisAttributes* fCopperCoilVis;
+    G4VisAttributes* fLeadTubeVis;
+    G4VisAttributes* fIronCoreVis;
 };
 
 #endif

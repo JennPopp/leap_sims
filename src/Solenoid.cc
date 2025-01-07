@@ -109,8 +109,8 @@ G4LogicalVolume* Solenoid::ConstructSolenoid() {
     //---------------------------------------------------------------
     G4Tubs* solidSolenoid = new G4Tubs("solidSolenoid",
                                         0.0*mm, // inner radius
-                                        rMax+150.0*mm,  // outer radius
-                                        fMagThick/2., // half length in z
+                                        rMax+200.0*mm,  // outer radius
+                                        fMagThick/2.+2*lanexThick, // half length in z
                                         0.0*deg,  // starting angle
                                         360.0*deg ); // total angle
 
@@ -340,6 +340,8 @@ G4LogicalVolume* Solenoid::ConstructSolenoid() {
                         1); // copy number 
     }
 
+      // Add Table if its set in the config file  
+ 
     if((fBeamLineStatus==1) || (fTableStatus!=0)){
       auto solidTable = new G4Box("solidTable",  //Name
                                 tableX/2.,   // half size in x 
@@ -359,8 +361,7 @@ G4LogicalVolume* Solenoid::ConstructSolenoid() {
                             0);                        //copy number
     }
 
-    // Add Table 
-
+  
     return logicSolenoid;
 }
 

@@ -48,8 +48,6 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
     //---------------------------------------------------------------
     G4double crystThick = 45.*cm; // length of the lead glass crystals
     G4double crystXY = 3.8*cm; // width in x/y of crystals
-    // G4double crystThick = 200.*cm; // length of the lead glass crystals
-    // G4double crystXY = 200*cm; // width in x/y of crystals
     G4double detThick = 1.0*mm; // thickness of virtual detectors 
 
     G4double alairgapthick = 0.001 *mm;   // thickness of the air gap between
@@ -63,7 +61,6 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
     G4double aluwraplength = alairgaplength + aluwrapthick;
 
     //defining the size of the Calorimetercell and the virtual calorimeter (mother volume of the calorimetercells)
-    //G4int NbofCalor = 9; //here later free parameter to select number of crystals
     G4double calorcellxy = aluwrapxy;
     G4double calorcelllength = aluwraplength + 2*detThick;
 
@@ -209,7 +206,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                         "logicAirGap");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,aluwrapthick),    //its position // old 0.,0.,-(aluwrapthick)/2
+                    G4ThreeVector(0.,0.,aluwrapthick/2),    //its position // old 0.,0.,-(aluwrapthick)/2
                     logicAirGap,            //its logical volume
                     "AlAirGap",                 //its name
                     logicAluWrap,               //its mother
@@ -229,7 +226,7 @@ G4LogicalVolume* Calorimeter::ConstructCalo() {
                                         "logicCrystal");       //its name
 
   new G4PVPlacement(0,                   //no rotation
-                    G4ThreeVector(0.,0.,alairgapthick),    //its position old 0.,0.,alairgapthick/2
+                    G4ThreeVector(0.,0.,alairgapthick/2),    
                     fLogicCrystal,            //its logical volume
                     "solidCrystal",                 //its name
                     logicAirGap,               //its mother
